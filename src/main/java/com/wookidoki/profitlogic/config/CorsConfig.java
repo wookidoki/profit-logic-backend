@@ -1,4 +1,4 @@
-package com.profitlogic.backend.config;
+package com.wookidoki.profitlogic.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

@@ -1,4 +1,4 @@
-package com.profitlogic.backend.config;
+package com.wookidoki.profitlogic.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -25,8 +25,9 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/h2-console/**").permitAll()
-                        .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/health").permitAll()
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/v1/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .headers(headers ->
