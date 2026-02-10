@@ -1,0 +1,19 @@
+# =============================================================
+# PRODUCTION CONFIGURATION
+# =============================================================
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+
+  # Production datasource is configured via application-private.yml
+
+server:
+  port: 8080
+
+logging:
+  level:
+    root: WARN
+    com.profitlogic: INFO
