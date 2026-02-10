@@ -1,13 +1,12 @@
-package com.profitlogic.backend;
+package com.wookidoki.profitlogic;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ProfitLogicBackendApplicationTests {
+class ProfitLogicApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
-
+    @Test
+    void contextLoads() {
+    }
 }

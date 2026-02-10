@@ -1,4 +1,4 @@
-package com.profitlogic.backend.controller;
+package com.wookidoki.profitlogic.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
