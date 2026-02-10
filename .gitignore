@@ -46,3 +46,6 @@ desktop.ini
 
 ### Private config ###
 src/main/resources/application-private.yml
+
+### Docker MySQL data ###
+db/data/
