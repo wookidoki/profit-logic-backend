@@ -1,5 +1,6 @@
 package com.wookidoki.profitlogic.common;
 
+import com.wookidoki.profitlogic.common.exception.BusinessLogicException;
 import com.wookidoki.profitlogic.common.exception.DuplicateEmailException;
 import com.wookidoki.profitlogic.common.exception.InvalidCredentialsException;
 import org.springframework.http.HttpStatus;
@@ -33,6 +34,12 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.badRequest()
                 .body(ResponseData.fail(message));
+    }
+
+    @ExceptionHandler(BusinessLogicException.class)
+    public ResponseEntity<ResponseData<Void>> handleBusinessLogic(BusinessLogicException ex) {
+        return ResponseEntity.badRequest()
+                .body(ResponseData.fail(ex.getMessage()));
     }
 
     @ExceptionHandler(ArithmeticException.class)
