@@ -44,7 +44,9 @@ desktop.ini
 ### Claude Code ###
 .claude/
 
-### Private config ###
+### Sensitive config (환경별 설정 — .example 파일만 커밋) ###
+src/main/resources/application.yml
+src/main/resources/application-prod.yml
 src/main/resources/application-private.yml
 
 ### Docker MySQL data ###
