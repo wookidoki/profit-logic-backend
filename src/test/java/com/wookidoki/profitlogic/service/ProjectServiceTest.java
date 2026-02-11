@@ -10,6 +10,7 @@ import com.wookidoki.profitlogic.repository.ChatLogRepository;
 import com.wookidoki.profitlogic.repository.CostDetailRepository;
 import com.wookidoki.profitlogic.repository.ProjectRepository;
 import com.wookidoki.profitlogic.repository.SimulationRepository;
+import com.wookidoki.profitlogic.repository.TimeLogRepository;
 import com.wookidoki.profitlogic.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -38,6 +39,7 @@ class ProjectServiceTest {
     @Mock private SimulationRepository simulationRepository;
     @Mock private ChatLogRepository chatLogRepository;
     @Mock private CostDetailRepository costDetailRepository;
+    @Mock private TimeLogRepository timeLogRepository;
 
     @InjectMocks
     private ProjectService projectService;
@@ -163,6 +165,7 @@ class ProjectServiceTest {
             verify(chatLogRepository).deleteByProjectId(10L);
             verify(simulationRepository).deleteByProjectId(10L);
             verify(costDetailRepository).deleteByProjectId(10L);
+            verify(timeLogRepository).deleteByProjectId(10L);
             verify(projectRepository).delete(project);
         }
 
