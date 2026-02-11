@@ -3,15 +3,13 @@ package com.wookidoki.profitlogic.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Table(name = "users")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class User {
+public class User extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,24 +21,15 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false, length = 50)
+    private String nickname;
+
     @Enumerated(EnumType.STRING)
-    @Column(name = "biz_type", nullable = false, length = 20)
+    @Column(nullable = false, length = 20)
+    @Builder.Default
+    private Role role = Role.ROLE_USER;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "biz_type", length = 20)
     private BizType bizType;
-
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 }
