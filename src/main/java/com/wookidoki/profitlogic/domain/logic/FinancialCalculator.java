@@ -7,7 +7,7 @@ import java.math.RoundingMode;
 
 /**
  * 핵심 금융 계산 엔진.
- * 모든 연산은 BigDecimal로 수행하며, 반올림은 HALF_UP, 소수점 이하 2자리 기준.
+ * 모든 연산은 BigDecimal로 수행. double/float 사용 금지.
  */
 @Component
 public class FinancialCalculator {
@@ -17,20 +17,18 @@ public class FinancialCalculator {
 
     /**
      * 손익분기점(BEP) = FixedCost / (Price - VariableCost)
+     * 결과는 소수점 첫째 자리에서 올림(CEILING)하여 정수로 반환.
      *
      * @throws ArithmeticException (Price - VariableCost) <= 0 인 경우
      */
-    public BigDecimal calculateBep(BigDecimal fixedCost, BigDecimal price, BigDecimal variableCost) {
+    public BigDecimal calculateBEP(BigDecimal fixedCost, BigDecimal price, BigDecimal variableCost) {
         BigDecimal contribution = price.subtract(variableCost);
 
         if (contribution.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new ArithmeticException(
-                    "공헌이익(판매가 - 변동비)이 0 이하입니다. 판매가가 변동비보다 커야 합니다. " +
-                    "현재 공헌이익: " + contribution
-            );
+            throw new ArithmeticException("공헌이익이 0 이하입니다");
         }
 
-        return fixedCost.divide(contribution, SCALE, ROUNDING);
+        return fixedCost.divide(contribution, 0, RoundingMode.CEILING);
     }
 
     /**
@@ -44,7 +42,7 @@ public class FinancialCalculator {
 
     /**
      * 경제적 이윤 = OperatingProfit - (WorkHours * HourlyWage)
-     * 사용자의 인건비(기회비용)를 뺀 진짜 이익
+     * 사용자의 인건비(기회비용)를 뺀 진짜 이익.
      */
     public BigDecimal calculateEconomicProfit(BigDecimal operatingProfit,
                                                BigDecimal workHours, BigDecimal hourlyWage) {
@@ -57,15 +55,12 @@ public class FinancialCalculator {
      *
      * @throws ArithmeticException (Price - VariableCost) <= 0 인 경우
      */
-    public BigDecimal calculateTargetQuantity(BigDecimal fixedCost, BigDecimal targetProfit,
-                                               BigDecimal price, BigDecimal variableCost) {
+    public BigDecimal calculateTargetSales(BigDecimal fixedCost, BigDecimal targetProfit,
+                                            BigDecimal price, BigDecimal variableCost) {
         BigDecimal contribution = price.subtract(variableCost);
 
         if (contribution.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new ArithmeticException(
-                    "공헌이익(판매가 - 변동비)이 0 이하입니다. 판매가가 변동비보다 커야 합니다. " +
-                    "현재 공헌이익: " + contribution
-            );
+            throw new ArithmeticException("공헌이익이 0 이하입니다");
         }
 
         return fixedCost.add(targetProfit).divide(contribution, SCALE, ROUNDING);

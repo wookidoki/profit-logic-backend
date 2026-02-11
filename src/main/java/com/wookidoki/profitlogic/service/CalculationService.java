@@ -25,11 +25,11 @@ public class CalculationService {
         // 공헌이익 (단위당)
         BigDecimal contributionMargin = price.subtract(variableCost);
 
-        // 손익분기점
-        BigDecimal bep = calculator.calculateBep(fixedCost, price, variableCost);
+        // 손익분기점 (CEILING 올림 → 정수)
+        BigDecimal bep = calculator.calculateBEP(fixedCost, price, variableCost);
 
         // 목표 판매량
-        BigDecimal targetQuantity = calculator.calculateTargetQuantity(
+        BigDecimal targetQuantity = calculator.calculateTargetSales(
                 fixedCost, targetProfit, price, variableCost);
 
         // 영업이익 (목표 판매량 기준)
