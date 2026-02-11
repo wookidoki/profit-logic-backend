@@ -33,6 +33,7 @@ public class SecurityConfig {
                         .requestMatchers("/health").permitAll()
                         .requestMatchers("/v1/auth/**").permitAll()
                         .requestMatchers("/v1/projects/calculate").permitAll()
+                        .requestMatchers("/v1/ai/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .headers(headers ->
