@@ -19,8 +19,10 @@ public class CalculationService {
         BigDecimal variableCost = request.getVariableCost();
         BigDecimal fixedCost = request.getFixedCost();
         BigDecimal workHours = new BigDecimal(request.getWorkHours());
-        BigDecimal hourlyWage = request.getHourlyWage();
         BigDecimal targetProfit = request.getTargetProfit();
+
+        // 최저임금 하한 적용 (9,860원 미만이면 강제 적용)
+        BigDecimal hourlyWage = calculator.applyMinimumWage(request.getHourlyWage());
 
         // 공헌이익 (단위당)
         BigDecimal contributionMargin = price.subtract(variableCost);
@@ -49,6 +51,9 @@ public class CalculationService {
         // 생존 가능 여부: 경제적 이윤이 양수인지
         boolean isViable = economicProfit.compareTo(BigDecimal.ZERO) > 0;
 
+        // 안전마진 Zone 분류 (GREEN / YELLOW / RED)
+        String zone = calculator.classifyZone(marginRate);
+
         return CalculateResponse.builder()
                 .breakEvenPoint(bep)
                 .operatingProfit(operatingProfit)
@@ -58,6 +63,8 @@ public class CalculationService {
                 .contributionMargin(contributionMargin)
                 .shadowWage(shadowWage)
                 .isViable(isViable)
+                .zone(zone)
+                .appliedHourlyWage(hourlyWage)
                 .build();
     }
 }

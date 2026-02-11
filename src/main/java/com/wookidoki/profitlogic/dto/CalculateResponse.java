@@ -36,4 +36,10 @@ public class CalculateResponse {
 
     /** 생존 가능 여부 (경제적 이윤 > 0) */
     private Boolean isViable;
+
+    /** 안전마진 Zone (GREEN / YELLOW / RED) */
+    private String zone;
+
+    /** 실제 적용된 시급 (최저임금 하한 적용 후) */
+    private BigDecimal appliedHourlyWage;
 }

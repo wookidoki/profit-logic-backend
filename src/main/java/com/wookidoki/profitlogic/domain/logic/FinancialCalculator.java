@@ -16,6 +16,20 @@ public class FinancialCalculator {
     private static final int SCALE = 2;
     private static final RoundingMode ROUNDING = RoundingMode.HALF_UP;
 
+    /** 2025년 기준 최저시급 */
+    public static final BigDecimal MINIMUM_WAGE = new BigDecimal("9860");
+
+    /**
+     * 시급에 최저임금 하한을 적용한다.
+     * hourlyWage < 9,860원이면 9,860원으로 강제 적용.
+     */
+    public BigDecimal applyMinimumWage(BigDecimal hourlyWage) {
+        if (hourlyWage.compareTo(MINIMUM_WAGE) < 0) {
+            return MINIMUM_WAGE;
+        }
+        return hourlyWage;
+    }
+
     /**
      * 손익분기점(BEP) = FixedCost / (Price - VariableCost)
      * 결과는 소수점 첫째 자리에서 올림(CEILING)하여 정수로 반환.
@@ -75,6 +89,22 @@ public class FinancialCalculator {
                 .divide(actualQuantity, SCALE + 2, ROUNDING)
                 .multiply(new BigDecimal("100"))
                 .setScale(SCALE, ROUNDING);
+    }
+
+    /**
+     * 안전마진 Zone 분류.
+     * - GREEN: 안전마진율 > 20% (안전 구간)
+     * - YELLOW: 0% <= 안전마진율 <= 20% (주의 구간)
+     * - RED: 안전마진율 < 0% (위험 구간)
+     */
+    public String classifyZone(BigDecimal marginRate) {
+        if (marginRate.compareTo(new BigDecimal("20")) > 0) {
+            return "GREEN";
+        } else if (marginRate.compareTo(BigDecimal.ZERO) >= 0) {
+            return "YELLOW";
+        } else {
+            return "RED";
+        }
     }
 
     private void validateContribution(BigDecimal contribution) {
