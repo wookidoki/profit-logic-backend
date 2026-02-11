@@ -49,3 +49,7 @@ src/main/resources/application-private.yml
 
 ### Docker MySQL data ###
 db/data/
+
+### Production deployment ###
+.env
+frontend-dist/

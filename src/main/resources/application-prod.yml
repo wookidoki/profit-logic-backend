@@ -3,17 +3,34 @@
 # =============================================================
 
 spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/profit_logic?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true}
+    username: ${SPRING_DATASOURCE_USERNAME:devuser}
+    password: ${SPRING_DATASOURCE_PASSWORD:devpass}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     show-sql: false
-
-  # Production datasource is configured via application-private.yml
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
 
 server:
   port: 8080
 
+jwt:
+  secret: ${JWT_SECRET:ZGV2LXNlY3JldC1rZXktZm9yLXByb2ZpdC1sb2dpYy1hcHBsaWNhdGlvbi0yMDI2}
+  expiration: ${JWT_EXPIRATION:86400000}
+
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
+  allowed-methods: GET,POST,PUT,DELETE,PATCH,OPTIONS
+  allowed-headers: "*"
+  allow-credentials: true
+
 logging:
   level:
     root: WARN
-    com.profitlogic: INFO
+    com.wookidoki.profitlogic: INFO
