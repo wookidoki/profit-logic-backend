@@ -38,4 +38,8 @@ public class Project extends BaseTimeEntity {
 
     @Column(name = "hourly_wage", nullable = false, precision = 19, scale = 2)
     private BigDecimal hourlyWage;
+
+    @Column(name = "is_public", nullable = false)
+    @Builder.Default
+    private Boolean isPublic = false;
 }
