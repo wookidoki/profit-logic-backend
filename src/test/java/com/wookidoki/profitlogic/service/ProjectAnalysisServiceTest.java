@@ -1,5 +1,6 @@
 package com.wookidoki.profitlogic.service;
 
+import com.wookidoki.profitlogic.common.exception.BusinessLogicException;
 import com.wookidoki.profitlogic.common.exception.ResourceNotFoundException;
 import com.wookidoki.profitlogic.common.exception.UnauthorizedAccessException;
 import com.wookidoki.profitlogic.domain.*;
@@ -306,6 +307,23 @@ class ProjectAnalysisServiceTest {
                     10L, 1L, new BigDecimal("12000"), null);
 
             assertThat(result.getElasticity()).isEqualByComparingTo(new BigDecimal("-1.5"));
+        }
+
+        @Test
+        @DisplayName("판매가 0원 → BusinessLogicException")
+        void priceSimulation_zeroPriceThrows() {
+            User user = createUser(1L);
+            Project project = Project.builder()
+                    .id(10L).user(user).title("무료 프로젝트")
+                    .price(BigDecimal.ZERO).variableCost(BigDecimal.ZERO)
+                    .fixedCost(new BigDecimal("500000")).workHours(160)
+                    .hourlyWage(new BigDecimal("9860")).build();
+            given(projectRepository.findById(10L)).willReturn(Optional.of(project));
+
+            assertThatThrownBy(() -> projectAnalysisService.simulatePriceChange(
+                    10L, 1L, new BigDecimal("5000"), null))
+                    .isInstanceOf(BusinessLogicException.class)
+                    .hasMessageContaining("판매가가 0원");
         }
 
         @Test

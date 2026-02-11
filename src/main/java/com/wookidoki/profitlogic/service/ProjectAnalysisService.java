@@ -1,5 +1,6 @@
 package com.wookidoki.profitlogic.service;
 
+import com.wookidoki.profitlogic.common.exception.BusinessLogicException;
 import com.wookidoki.profitlogic.common.exception.ResourceNotFoundException;
 import com.wookidoki.profitlogic.common.exception.UnauthorizedAccessException;
 import com.wookidoki.profitlogic.domain.CostCategory;
@@ -69,6 +70,9 @@ public class ProjectAnalysisService {
         }
 
         BigDecimal currentPrice = project.getPrice();
+        if (currentPrice.compareTo(BigDecimal.ZERO) == 0) {
+            throw new BusinessLogicException("현재 판매가가 0원이므로 가격 시뮬레이션을 수행할 수 없습니다.");
+        }
         BigDecimal variableCost = project.getVariableCost();
         BigDecimal enhancedFixedCost = getEnhancedFixedCost(projectId, project);
         BigDecimal contribution = currentPrice.subtract(variableCost);
