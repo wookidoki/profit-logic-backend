@@ -8,9 +8,9 @@ spring:
 
   # Datasource (Docker MySQL)
   datasource:
-    url: jdbc:mysql://localhost:3306/profit_logic?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
-    username: devuser
-    password: devpass
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/profit_logic?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true}
+    username: ${SPRING_DATASOURCE_USERNAME:devuser}
+    password: ${SPRING_DATASOURCE_PASSWORD:devpass}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   # JPA
@@ -42,8 +42,8 @@ logging:
 
 # JWT
 jwt:
-  secret: ZGV2LXNlY3JldC1rZXktZm9yLXByb2ZpdC1sb2dpYy1hcHBsaWNhdGlvbi0yMDI2
-  expiration: 86400000
+  secret: ${JWT_SECRET:ZGV2LXNlY3JldC1rZXktZm9yLXByb2ZpdC1sb2dpYy1hcHBsaWNhdGlvbi0yMDI2}
+  expiration: ${JWT_EXPIRATION:86400000}
 
 # CORS
 cors:
