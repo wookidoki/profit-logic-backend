@@ -45,6 +45,17 @@ jwt:
   secret: ${JWT_SECRET:ZGV2LXNlY3JldC1rZXktZm9yLXByb2ZpdC1sb2dpYy1hcHBsaWNhdGlvbi0yMDI2}
   expiration: ${JWT_EXPIRATION:86400000}
 
+# LLM
+llm:
+  provider: gemini
+  gemini:
+    api-key: ${GEMINI_API_KEY:}
+    model-light: gemini-2.5-flash
+    model-heavy: gemini-2.5-pro
+    max-tokens-light: 1000
+    max-tokens-heavy: 4000
+    base-url: https://generativelanguage.googleapis.com/v1beta
+
 # CORS
 cors:
   allowed-origins: http://localhost:5173
