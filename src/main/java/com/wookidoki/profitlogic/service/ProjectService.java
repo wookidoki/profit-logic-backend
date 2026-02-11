@@ -7,10 +7,7 @@ import com.wookidoki.profitlogic.domain.User;
 import com.wookidoki.profitlogic.dto.ProjectCreateRequest;
 import com.wookidoki.profitlogic.dto.ProjectResponse;
 import com.wookidoki.profitlogic.dto.ProjectUpdateRequest;
-import com.wookidoki.profitlogic.repository.ChatLogRepository;
-import com.wookidoki.profitlogic.repository.ProjectRepository;
-import com.wookidoki.profitlogic.repository.SimulationRepository;
-import com.wookidoki.profitlogic.repository.UserRepository;
+import com.wookidoki.profitlogic.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +21,10 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
     private final SimulationRepository simulationRepository;
+    private final SimulationLogRepository simulationLogRepository;
     private final ChatLogRepository chatLogRepository;
+    private final CommentRepository commentRepository;
+    private final BoardPostRepository boardPostRepository;
 
     @Transactional
     public ProjectResponse create(Long userId, ProjectCreateRequest request) {
@@ -81,8 +81,13 @@ public class ProjectService {
     public void delete(Long projectId, Long userId) {
         Project project = findProjectOrThrow(projectId);
         validateOwnership(project, userId);
-        chatLogRepository.deleteByProjectId(projectId);
+
+        // 자식 테이블 일괄 삭제 (순서 중요: FK 의존성 역순)
+        commentRepository.deleteByProjectId(projectId);
+        boardPostRepository.deleteByProjectId(projectId);
+        simulationLogRepository.deleteByProjectId(projectId);
         simulationRepository.deleteByProjectId(projectId);
+        chatLogRepository.deleteByProjectId(projectId);
         projectRepository.delete(project);
     }
 

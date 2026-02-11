@@ -6,11 +6,11 @@ spring:
     active: local
     include: private
 
-  # Datasource (Docker MySQL)
+  # Datasource — 환경변수로 주입 (로컬은 application-local.yml에서 H2로 오버라이드)
   datasource:
-    url: jdbc:mysql://localhost:3306/profit_logic?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
-    username: devuser
-    password: devpass
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/profit_logic?serverTimezone=Asia/Seoul&characterEncoding=UTF-8}
+    username: ${SPRING_DATASOURCE_USERNAME:}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   # JPA
@@ -40,10 +40,10 @@ logging:
     com.wookidoki.profitlogic: DEBUG
     org.hibernate.SQL: DEBUG
 
-# JWT
+# JWT — 환경변수로 주입 (프로덕션에서는 반드시 강력한 시크릿 사용)
 jwt:
-  secret: ZGV2LXNlY3JldC1rZXktZm9yLXByb2ZpdC1sb2dpYy1hcHBsaWNhdGlvbi0yMDI2
-  expiration: 86400000
+  secret: ${JWT_SECRET:bG9jYWwtZGV2LW9ubHktand0LXNlY3JldC1rZXktMjU2Yml0cy1taW5pbXVtLXBhZGRpbmc=}
+  expiration: ${JWT_EXPIRATION:86400000}
 
 # CORS
 cors:

@@ -56,7 +56,7 @@ public class CommunityService {
     public Page<BoardPostResponse> getPosts(Pageable pageable) {
         return boardPostRepository.findAllByOrderByCreatedAtDesc(pageable)
                 .map(post -> {
-                    int commentCount = commentRepository.findByPostIdOrderByCreatedAtAsc(post.getId()).size();
+                    int commentCount = (int) commentRepository.countByPostId(post.getId());
                     return BoardPostResponse.from(post, commentCount);
                 });
     }
@@ -65,7 +65,7 @@ public class CommunityService {
     public BoardPostResponse getPost(Long postId) {
         BoardPost post = findPostOrThrow(postId);
         post.incrementViewCount();
-        int commentCount = commentRepository.findByPostIdOrderByCreatedAtAsc(postId).size();
+        int commentCount = (int) commentRepository.countByPostId(postId);
         return BoardPostResponse.from(post, commentCount);
     }
 
@@ -75,7 +75,7 @@ public class CommunityService {
         if (!post.getUser().getId().equals(userId)) {
             throw new UnauthorizedAccessException();
         }
-        commentRepository.deleteAll(commentRepository.findByPostIdOrderByCreatedAtAsc(postId));
+        commentRepository.deleteByPostId(postId);
         boardPostRepository.delete(post);
     }
 

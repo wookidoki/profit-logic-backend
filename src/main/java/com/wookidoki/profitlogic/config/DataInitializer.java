@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@Profile({"local", "prod"})
+@Profile("local")
 public class DataInitializer implements CommandLineRunner {
 
     private final UserRepository userRepository;
@@ -139,6 +139,6 @@ public class DataInitializer implements CommandLineRunner {
                         + "단위당 공헌이익은 13000원입니다. 자세한 수익 분석은 대시보드를 확인해주세요.")
                 .build());
 
-        log.info("[DataInitializer] 시드 데이터 생성 완료! (creator@test.com / seller@test.com / 비밀번호: test1234)");
+        log.info("[DataInitializer] 시드 데이터 생성 완료! (creator@test.com / seller@test.com)");
     }
 }
