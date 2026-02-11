@@ -8,4 +8,6 @@ import java.util.List;
 public interface SimulationRepository extends JpaRepository<Simulation, Long> {
 
     List<Simulation> findByProjectId(Long projectId);
+
+    void deleteByProjectId(Long projectId);
 }

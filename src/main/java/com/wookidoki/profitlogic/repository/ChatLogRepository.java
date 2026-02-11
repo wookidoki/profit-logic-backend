@@ -8,4 +8,6 @@ import java.util.List;
 public interface ChatLogRepository extends JpaRepository<ChatLog, Long> {
 
     List<ChatLog> findByUserIdAndProjectIdOrderByCreatedAtDesc(Long userId, Long projectId);
+
+    void deleteByProjectId(Long projectId);
 }
