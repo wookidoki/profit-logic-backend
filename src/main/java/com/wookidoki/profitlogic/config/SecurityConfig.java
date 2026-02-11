@@ -35,6 +35,7 @@ public class SecurityConfig {
                         .requestMatchers("/v1/auth/**").permitAll()
                         .requestMatchers("/v1/analysis/**").permitAll()
                         .requestMatchers("/v1/ai/**").permitAll()
+                        .requestMatchers("/v1/scripts/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/v1/community/posts").permitAll()
                         .requestMatchers(HttpMethod.GET, "/v1/community/posts/{postId}").permitAll()
                         .requestMatchers(HttpMethod.GET, "/v1/community/posts/{postId}/comments").permitAll()
