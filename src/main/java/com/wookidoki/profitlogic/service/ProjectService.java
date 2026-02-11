@@ -7,7 +7,9 @@ import com.wookidoki.profitlogic.domain.User;
 import com.wookidoki.profitlogic.dto.ProjectCreateRequest;
 import com.wookidoki.profitlogic.dto.ProjectResponse;
 import com.wookidoki.profitlogic.dto.ProjectUpdateRequest;
+import com.wookidoki.profitlogic.repository.ChatLogRepository;
 import com.wookidoki.profitlogic.repository.ProjectRepository;
+import com.wookidoki.profitlogic.repository.SimulationRepository;
 import com.wookidoki.profitlogic.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,8 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
+    private final SimulationRepository simulationRepository;
+    private final ChatLogRepository chatLogRepository;
 
     @Transactional
     public ProjectResponse create(Long userId, ProjectCreateRequest request) {
@@ -77,6 +81,8 @@ public class ProjectService {
     public void delete(Long projectId, Long userId) {
         Project project = findProjectOrThrow(projectId);
         validateOwnership(project, userId);
+        chatLogRepository.deleteByProjectId(projectId);
+        simulationRepository.deleteByProjectId(projectId);
         projectRepository.delete(project);
     }
 
