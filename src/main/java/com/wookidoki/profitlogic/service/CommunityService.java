@@ -56,7 +56,7 @@ public class CommunityService {
     public Page<BoardPostResponse> getPosts(Pageable pageable) {
         return boardPostRepository.findAllByOrderByCreatedAtDesc(pageable)
                 .map(post -> {
-                    int commentCount = commentRepository.findByPostIdOrderByCreatedAtAsc(post.getId()).size();
+                    int commentCount = commentRepository.countByPostId(post.getId());
                     return BoardPostResponse.from(post, commentCount);
                 });
     }
@@ -65,7 +65,7 @@ public class CommunityService {
     public BoardPostResponse getPost(Long postId) {
         BoardPost post = findPostOrThrow(postId);
         post.incrementViewCount();
-        int commentCount = commentRepository.findByPostIdOrderByCreatedAtAsc(postId).size();
+        int commentCount = commentRepository.countByPostId(postId);
         return BoardPostResponse.from(post, commentCount);
     }
 
