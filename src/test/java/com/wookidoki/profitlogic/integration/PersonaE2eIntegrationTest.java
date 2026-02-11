@@ -87,7 +87,7 @@ class PersonaE2eIntegrationTest {
         private Long simulationId;
 
         static final String EMAIL = "creator@example.com";
-        static final String PASSWORD = "creator1234";
+        static final String PASSWORD = "Creator1234!";
         static final String NICKNAME = "웹소설작가김";
 
         @Test @Order(1)
@@ -300,7 +300,7 @@ class PersonaE2eIntegrationTest {
         private Long simulationId;
 
         static final String EMAIL = "seller@example.com";
-        static final String PASSWORD = "seller12345";
+        static final String PASSWORD = "Seller12345!";
         static final String NICKNAME = "쇼핑몰셀러박";
 
         @Test @Order(1)
@@ -478,8 +478,8 @@ class PersonaE2eIntegrationTest {
         @Test @Order(1)
         @DisplayName("1. 두 사용자 생성 및 UserX 프로젝트 생성")
         void setup() throws Exception {
-            tokenX = signupAndLogin("security-x@test.com", "password1234", "유저X");
-            tokenY = signupAndLogin("security-y@test.com", "password1234", "유저Y");
+            tokenX = signupAndLogin("security-x@test.com", "Password1234!", "유저X");
+            tokenY = signupAndLogin("security-y@test.com", "Password1234!", "유저Y");
 
             Map<String, Object> body = Map.of(
                     "title", "X의 비밀 프로젝트",
@@ -541,7 +541,7 @@ class PersonaE2eIntegrationTest {
         @Test @Order(1)
         @DisplayName("1. 인증 사용자가 게시글 + 댓글 생성 (setup)")
         void setup() throws Exception {
-            token = signupAndLogin("community@test.com", "password1234", "커뮤니티유저");
+            token = signupAndLogin("community@test.com", "Password1234!", "커뮤니티유저");
 
             Map<String, Object> postBody = Map.of(
                     "title", "공개 게시글", "content", "누구나 볼 수 있는 글입니다"
@@ -614,7 +614,7 @@ class PersonaE2eIntegrationTest {
         @DisplayName("회원가입 - 잘못된 이메일 형식 → 400")
         void signupInvalidEmail() throws Exception {
             Map<String, Object> body = Map.of(
-                    "email", "not-an-email", "password", "password123", "nickname", "테스터"
+                    "email", "not-an-email", "password", "Password123!", "nickname", "테스터"
             );
             ResponseEntity<String> resp = restTemplate.exchange(url("/v1/auth/signup"),
                     HttpMethod.POST, new HttpEntity<>(body, jsonHeaders()), String.class);
@@ -637,7 +637,7 @@ class PersonaE2eIntegrationTest {
         @DisplayName("회원가입 - 닉네임 1자 → 400")
         void signupShortNickname() {
             Map<String, Object> body = Map.of(
-                    "email", "nick@test.com", "password", "password123", "nickname", "A"
+                    "email", "nick@test.com", "password", "Password123!", "nickname", "A"
             );
             ResponseEntity<String> resp = restTemplate.exchange(url("/v1/auth/signup"),
                     HttpMethod.POST, new HttpEntity<>(body, jsonHeaders()), String.class);
