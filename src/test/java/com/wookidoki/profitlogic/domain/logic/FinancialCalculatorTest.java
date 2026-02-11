@@ -205,4 +205,78 @@ class FinancialCalculatorTest {
             assertEquals(new BigDecimal("0.00"), result);
         }
     }
+
+    @Nested
+    @DisplayName("applyMinimumWage - 최저임금 하한 적용")
+    class ApplyMinimumWageTest {
+
+        @Test
+        @DisplayName("시급 5000원 → 9860원으로 강제 적용")
+        void shouldApplyMinimumWhenBelow() {
+            BigDecimal result = calculator.applyMinimumWage(new BigDecimal("5000"));
+            assertEquals(FinancialCalculator.MINIMUM_WAGE, result);
+        }
+
+        @Test
+        @DisplayName("시급 9860원 → 그대로 유지")
+        void shouldKeepWhenExact() {
+            BigDecimal result = calculator.applyMinimumWage(new BigDecimal("9860"));
+            assertEquals(new BigDecimal("9860"), result);
+        }
+
+        @Test
+        @DisplayName("시급 15000원 → 그대로 유지")
+        void shouldKeepWhenAbove() {
+            BigDecimal result = calculator.applyMinimumWage(new BigDecimal("15000"));
+            assertEquals(new BigDecimal("15000"), result);
+        }
+
+        @Test
+        @DisplayName("시급 0원 → 9860원으로 강제 적용")
+        void shouldApplyMinimumWhenZero() {
+            BigDecimal result = calculator.applyMinimumWage(BigDecimal.ZERO);
+            assertEquals(FinancialCalculator.MINIMUM_WAGE, result);
+        }
+    }
+
+    @Nested
+    @DisplayName("classifyZone - 안전마진 Zone 분류")
+    class ClassifyZoneTest {
+
+        @Test
+        @DisplayName("안전마진율 50% → GREEN")
+        void shouldReturnGreenWhenHigh() {
+            assertEquals("GREEN", calculator.classifyZone(new BigDecimal("50.00")));
+        }
+
+        @Test
+        @DisplayName("안전마진율 20.01% → GREEN")
+        void shouldReturnGreenJustAboveThreshold() {
+            assertEquals("GREEN", calculator.classifyZone(new BigDecimal("20.01")));
+        }
+
+        @Test
+        @DisplayName("안전마진율 20.00% → YELLOW")
+        void shouldReturnYellowAtThreshold() {
+            assertEquals("YELLOW", calculator.classifyZone(new BigDecimal("20.00")));
+        }
+
+        @Test
+        @DisplayName("안전마진율 10% → YELLOW")
+        void shouldReturnYellowWhenModerate() {
+            assertEquals("YELLOW", calculator.classifyZone(new BigDecimal("10.00")));
+        }
+
+        @Test
+        @DisplayName("안전마진율 0% → YELLOW")
+        void shouldReturnYellowAtZero() {
+            assertEquals("YELLOW", calculator.classifyZone(BigDecimal.ZERO));
+        }
+
+        @Test
+        @DisplayName("안전마진율 -5% → RED")
+        void shouldReturnRedWhenNegative() {
+            assertEquals("RED", calculator.classifyZone(new BigDecimal("-5.00")));
+        }
+    }
 }
