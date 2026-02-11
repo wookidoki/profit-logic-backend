@@ -31,6 +31,9 @@ public class CalculateResponse {
     /** 공헌이익 (단위당) */
     private BigDecimal contributionMargin;
 
+    /** 실질 시급 (영업이익 / 근무시간) */
+    private BigDecimal shadowWage;
+
     /** 생존 가능 여부 (경제적 이윤 > 0) */
     private Boolean isViable;
 }

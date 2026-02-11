@@ -3,6 +3,8 @@ package com.wookidoki.profitlogic.common;
 import com.wookidoki.profitlogic.common.exception.BusinessLogicException;
 import com.wookidoki.profitlogic.common.exception.DuplicateEmailException;
 import com.wookidoki.profitlogic.common.exception.InvalidCredentialsException;
+import com.wookidoki.profitlogic.common.exception.ResourceNotFoundException;
+import com.wookidoki.profitlogic.common.exception.UnauthorizedAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -34,6 +36,18 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.badRequest()
                 .body(ResponseData.fail(message));
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ResponseData<Void>> handleResourceNotFound(ResourceNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ResponseData.fail(ex.getMessage()));
+    }
+
+    @ExceptionHandler(UnauthorizedAccessException.class)
+    public ResponseEntity<ResponseData<Void>> handleUnauthorizedAccess(UnauthorizedAccessException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ResponseData.fail(ex.getMessage()));
     }
 
     @ExceptionHandler(BusinessLogicException.class)
