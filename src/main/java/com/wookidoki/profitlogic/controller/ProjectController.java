@@ -1,5 +1,6 @@
 package com.wookidoki.profitlogic.controller;
 
+import com.wookidoki.profitlogic.common.ResponseData;
 import com.wookidoki.profitlogic.dto.CalculateRequest;
 import com.wookidoki.profitlogic.dto.CalculateResponse;
 import com.wookidoki.profitlogic.service.CalculationService;
@@ -19,8 +20,9 @@ public class ProjectController {
     private final CalculationService calculationService;
 
     @PostMapping("/calculate")
-    public ResponseEntity<CalculateResponse> calculate(@Valid @RequestBody CalculateRequest request) {
-        CalculateResponse response = calculationService.calculate(request);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<ResponseData<CalculateResponse>> calculate(
+            @Valid @RequestBody CalculateRequest request) {
+        CalculateResponse result = calculationService.calculate(request);
+        return ResponseEntity.ok(ResponseData.success(result));
     }
 }
