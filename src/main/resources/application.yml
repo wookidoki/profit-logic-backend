@@ -40,6 +40,11 @@ logging:
     com.wookidoki.profitlogic: DEBUG
     org.hibernate.SQL: DEBUG
 
+# JWT
+jwt:
+  secret: ZGV2LXNlY3JldC1rZXktZm9yLXByb2ZpdC1sb2dpYy1hcHBsaWNhdGlvbi0yMDI2
+  expiration: 86400000
+
 # CORS
 cors:
   allowed-origins: http://localhost:5173
