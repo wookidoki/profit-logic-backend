@@ -6,6 +6,13 @@ spring:
     active: local
     include: private
 
+  # Datasource (Docker MySQL)
+  datasource:
+    url: jdbc:mysql://localhost:3306/profit_logic?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+    username: devuser
+    password: devpass
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
   # JPA
   jpa:
     hibernate:
@@ -30,7 +37,7 @@ server:
 logging:
   level:
     root: INFO
-    com.profitlogic: DEBUG
+    com.wookidoki.profitlogic: DEBUG
     org.hibernate.SQL: DEBUG
 
 # CORS

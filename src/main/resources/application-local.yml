@@ -1,9 +1,8 @@
 # =============================================================
-# LOCAL DEVELOPMENT CONFIGURATION
+# LOCAL DEVELOPMENT CONFIGURATION (H2 In-Memory)
 # =============================================================
 
 spring:
-  # H2 in-memory database for local development
   datasource:
     url: jdbc:h2:mem:profit_logic_dev;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     username: sa
@@ -22,13 +21,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
 
-  # Disable security for local development
-  security:
-    user:
-      name: admin
-      password: admin
-
 logging:
   level:
     root: DEBUG
-    com.profitlogic: DEBUG
+    com.wookidoki.profitlogic: DEBUG
