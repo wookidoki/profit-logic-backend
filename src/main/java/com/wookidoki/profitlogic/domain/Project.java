@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 @Entity
 @Table(name = "projects")
@@ -42,6 +43,14 @@ public class Project extends BaseTimeEntity {
     @Column(name = "is_public", nullable = false)
     @Builder.Default
     private Boolean isPublic = false;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "creator_category", length = 30)
+    private CreatorCategory creatorCategory;
+
+    @Lob
+    @Column(name = "script_inputs", columnDefinition = "TEXT")
+    private String scriptInputs;
 
     public void update(String title, BigDecimal price, BigDecimal variableCost,
                        BigDecimal fixedCost, Integer workHours, BigDecimal hourlyWage,
