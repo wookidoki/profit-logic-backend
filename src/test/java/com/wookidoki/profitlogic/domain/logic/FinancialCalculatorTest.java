@@ -1,5 +1,6 @@
 package com.wookidoki.profitlogic.domain.logic;
 
+import com.wookidoki.profitlogic.common.exception.BusinessLogicException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -36,7 +37,6 @@ class FinancialCalculatorTest {
         @Test
         @DisplayName("올림 검증: 나누어 떨어지지 않으면 CEILING 올림")
         void shouldCeilWhenNotDivisible() {
-            // 100000 / (10000 - 3000) = 100000 / 7000 = 14.285... → 올림 15
             BigDecimal result = calculator.calculateBEP(
                     new BigDecimal("100000"),
                     new BigDecimal("10000"),
@@ -46,22 +46,22 @@ class FinancialCalculatorTest {
         }
 
         @Test
-        @DisplayName("예외: 판매가 = 변동비 (마진 0원) → ArithmeticException")
+        @DisplayName("예외: 판매가 = 변동비 → BusinessLogicException")
         void shouldThrowWhenMarginZero() {
-            ArithmeticException exception = assertThrows(ArithmeticException.class, () ->
+            BusinessLogicException ex = assertThrows(BusinessLogicException.class, () ->
                     calculator.calculateBEP(
                             new BigDecimal("1000000"),
                             new BigDecimal("10000"),
                             new BigDecimal("10000")
                     )
             );
-            assertTrue(exception.getMessage().contains("공헌이익이 0 이하입니다"));
+            assertTrue(ex.getMessage().contains("팔수록 손해입니다"));
         }
 
         @Test
-        @DisplayName("예외: 판매가 < 변동비 (마이너스 마진) → ArithmeticException")
+        @DisplayName("예외: 판매가 < 변동비 → BusinessLogicException")
         void shouldThrowWhenMarginNegative() {
-            assertThrows(ArithmeticException.class, () ->
+            assertThrows(BusinessLogicException.class, () ->
                     calculator.calculateBEP(
                             new BigDecimal("1000000"),
                             new BigDecimal("5000"),
@@ -99,6 +99,42 @@ class FinancialCalculatorTest {
     }
 
     @Nested
+    @DisplayName("calculateShadowWage - 실질 시급")
+    class CalculateShadowWageTest {
+
+        @Test
+        @DisplayName("정상: 영업이익 100만, 160시간 → 시급 6250원")
+        void shouldReturnCorrectShadowWage() {
+            BigDecimal result = calculator.calculateShadowWage(
+                    new BigDecimal("1000000"),
+                    new BigDecimal("160")
+            );
+            assertEquals(new BigDecimal("6250.00"), result);
+        }
+
+        @Test
+        @DisplayName("음수 영업이익 → 음수 시급 반환")
+        void shouldReturnNegativeWhenLoss() {
+            BigDecimal result = calculator.calculateShadowWage(
+                    new BigDecimal("-500000"),
+                    new BigDecimal("160")
+            );
+            assertEquals(new BigDecimal("-3125.00"), result);
+        }
+
+        @Test
+        @DisplayName("예외: 근무시간 0 → BusinessLogicException")
+        void shouldThrowWhenWorkHoursZero() {
+            assertThrows(BusinessLogicException.class, () ->
+                    calculator.calculateShadowWage(
+                            new BigDecimal("1000000"),
+                            BigDecimal.ZERO
+                    )
+            );
+        }
+    }
+
+    @Nested
     @DisplayName("calculateTargetSales - 목표 판매량")
     class CalculateTargetSalesTest {
 
@@ -115,9 +151,9 @@ class FinancialCalculatorTest {
         }
 
         @Test
-        @DisplayName("예외: 공헌이익 0 이하 → ArithmeticException")
+        @DisplayName("예외: 공헌이익 0 이하 → BusinessLogicException")
         void shouldThrowWhenContributionNonPositive() {
-            assertThrows(ArithmeticException.class, () ->
+            assertThrows(BusinessLogicException.class, () ->
                     calculator.calculateTargetSales(
                             new BigDecimal("1000000"),
                             new BigDecimal("1000000"),

@@ -43,6 +43,9 @@ public class CalculationService {
         // 안전마진율 (목표 판매량 기준)
         BigDecimal marginRate = calculator.calculateMarginRate(targetQuantity, bep);
 
+        // 실질 시급
+        BigDecimal shadowWage = calculator.calculateShadowWage(operatingProfit, workHours);
+
         // 생존 가능 여부: 경제적 이윤이 양수인지
         boolean isViable = economicProfit.compareTo(BigDecimal.ZERO) > 0;
 
@@ -53,6 +56,7 @@ public class CalculationService {
                 .targetQuantity(targetQuantity)
                 .marginRate(marginRate)
                 .contributionMargin(contributionMargin)
+                .shadowWage(shadowWage)
                 .isViable(isViable)
                 .build();
     }

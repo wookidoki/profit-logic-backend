@@ -4,6 +4,7 @@ import com.wookidoki.profitlogic.config.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -32,8 +33,11 @@ public class SecurityConfig {
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/health").permitAll()
                         .requestMatchers("/v1/auth/**").permitAll()
-                        .requestMatchers("/v1/projects/calculate").permitAll()
+                        .requestMatchers("/v1/analysis/**").permitAll()
                         .requestMatchers("/v1/ai/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/v1/community/posts").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/v1/community/posts/{postId}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/v1/community/posts/{postId}/comments").permitAll()
                         .anyRequest().authenticated()
                 )
                 .headers(headers ->
