@@ -8,6 +8,7 @@ import com.wookidoki.profitlogic.dto.ProjectCreateRequest;
 import com.wookidoki.profitlogic.dto.ProjectResponse;
 import com.wookidoki.profitlogic.dto.ProjectUpdateRequest;
 import com.wookidoki.profitlogic.repository.ChatLogRepository;
+import com.wookidoki.profitlogic.repository.CostDetailRepository;
 import com.wookidoki.profitlogic.repository.ProjectRepository;
 import com.wookidoki.profitlogic.repository.SimulationRepository;
 import com.wookidoki.profitlogic.repository.UserRepository;
@@ -25,6 +26,7 @@ public class ProjectService {
     private final UserRepository userRepository;
     private final SimulationRepository simulationRepository;
     private final ChatLogRepository chatLogRepository;
+    private final CostDetailRepository costDetailRepository;
 
     @Transactional
     public ProjectResponse create(Long userId, ProjectCreateRequest request) {
@@ -83,6 +85,7 @@ public class ProjectService {
         validateOwnership(project, userId);
         chatLogRepository.deleteByProjectId(projectId);
         simulationRepository.deleteByProjectId(projectId);
+        costDetailRepository.deleteByProjectId(projectId);
         projectRepository.delete(project);
     }
 
