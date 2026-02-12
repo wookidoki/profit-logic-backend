@@ -336,7 +336,7 @@ public class DataInitializer implements CommandLineRunner {
         // ══════════════════════════════════════════
         // 데모 계정 (평가/시연용)
         // ══════════════════════════════════════════
-        String demoPw = passwordEncoder.encode("password123");
+        String demoPw = passwordEncoder.encode("Test1234!");
         User demo = userRepository.save(User.builder()
                 .email("demo@profitlogic.com")
                 .password(demoPw)
@@ -431,7 +431,7 @@ public class DataInitializer implements CommandLineRunner {
 
         log.info("[DataInitializer] 시드 데이터 생성 완료!");
         log.info("  관리자: admin@profitlogic.com / Test1234!");
-        log.info("  데모: demo@profitlogic.com / password123 (프로젝트 3개, 카테고리 포함)");
+        log.info("  데모: demo@profitlogic.com / Test1234! (프로젝트 3개, 카테고리 포함)");
         log.info("  페르소나: creator01~10, seller01~10, dev01~10 @test.com / Test1234!");
     }
 
