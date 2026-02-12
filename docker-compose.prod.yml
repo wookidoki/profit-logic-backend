@@ -44,7 +44,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRATION: 86400000
-      CORS_ALLOWED_ORIGINS: http://${SERVER_IP},http://${SERVER_IP}:80
+      CORS_ALLOWED_ORIGINS: http://${SERVER_IP},http://${SERVER_IP}:80,http://profitlogic.cloud,http://www.profitlogic.cloud
       GEMINI_API_KEY: ${GEMINI_API_KEY}
     networks:
       - profit-network
