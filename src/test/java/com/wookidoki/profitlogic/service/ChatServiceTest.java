@@ -5,10 +5,15 @@ import com.wookidoki.profitlogic.client.LlmResponse;
 import com.wookidoki.profitlogic.common.exception.ResourceNotFoundException;
 import com.wookidoki.profitlogic.common.exception.UnauthorizedAccessException;
 import com.wookidoki.profitlogic.domain.ChatLog;
+import com.wookidoki.profitlogic.domain.CreatorCategory;
 import com.wookidoki.profitlogic.domain.Project;
 import com.wookidoki.profitlogic.domain.User;
 import com.wookidoki.profitlogic.dto.chat.ChatRequest;
 import com.wookidoki.profitlogic.dto.chat.ChatResponse;
+import com.wookidoki.profitlogic.dto.finance.BepDto;
+import com.wookidoki.profitlogic.dto.finance.CostBreakdownDto;
+import com.wookidoki.profitlogic.dto.finance.ShadowWageDto;
+import com.wookidoki.profitlogic.dto.project.ProjectAnalysisResponse;
 import com.wookidoki.profitlogic.repository.ChatLogRepository;
 import com.wookidoki.profitlogic.repository.ProjectRepository;
 import com.wookidoki.profitlogic.repository.UserRepository;
@@ -22,12 +27,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
@@ -41,6 +48,7 @@ class ChatServiceTest {
     @Mock private UserRepository userRepository;
     @Mock private ProjectRepository projectRepository;
     @Mock private LlmClient llmClient;
+    @Mock private ProjectAnalysisService projectAnalysisService;
 
     @InjectMocks
     private ChatService chatService;
@@ -58,6 +66,36 @@ class ChatServiceTest {
                 .fixedCost(new BigDecimal("500000"))
                 .workHours(160)
                 .hourlyWage(new BigDecimal("9860"))
+                .creatorCategory(CreatorCategory.EMOTICON)
+                .build();
+    }
+
+    private ProjectAnalysisResponse createAnalysisResponse() {
+        return ProjectAnalysisResponse.builder()
+                .projectId(10L)
+                .projectTitle("이모티콘 프로젝트")
+                .bep(BepDto.builder()
+                        .bep(new BigDecimal("62.5"))
+                        .enhancedFixedCost(new BigDecimal("500000"))
+                        .price(new BigDecimal("10000"))
+                        .variableCostPerUnit(new BigDecimal("2000"))
+                        .contributionMargin(new BigDecimal("8000"))
+                        .build())
+                .shadowWage(ShadowWageDto.builder()
+                        .realShadowWage(new BigDecimal("9860"))
+                        .minimumWageRatio(new BigDecimal("100.00"))
+                        .totalHours(new BigDecimal("160"))
+                        .operatingProfit(new BigDecimal("1577600"))
+                        .minimumWage(new BigDecimal("9860"))
+                        .hasTimeData(false)
+                        .build())
+                .costBreakdown(CostBreakdownDto.builder()
+                        .totalFixedCost(new BigDecimal("0"))
+                        .totalVariableCost(new BigDecimal("0"))
+                        .totalCost(new BigDecimal("0"))
+                        .categoryRatio(Collections.emptyMap())
+                        .build())
+                .actionCards(Collections.emptyList())
                 .build();
     }
 
@@ -71,14 +109,16 @@ class ChatServiceTest {
             User user = createUser(1L);
             Project project = createProject(10L, user);
             ChatRequest request = ChatRequest.builder()
-                    .projectId(10L).question("손익분기점이 뭔가요?").build();
+                    .projectId(10L).question("월 최소 몇 건을 해야 해?").build();
 
             given(userRepository.findById(1L)).willReturn(Optional.of(user));
             given(projectRepository.findById(10L)).willReturn(Optional.of(project));
             given(llmClient.isAvailable()).willReturn(true);
+            given(projectAnalysisService.analyzeProject(10L, 1L))
+                    .willReturn(createAnalysisResponse());
             given(llmClient.chatWithUsage(anyString(), anyString()))
                     .willReturn(LlmResponse.builder()
-                            .content("손익분기점은 63개입니다.")
+                            .content("월 최소 63건을 달성해야 합니다.")
                             .inputTokens(150).outputTokens(30).totalTokens(180).build());
             given(chatLogRepository.save(any(ChatLog.class)))
                     .willAnswer(invocation -> {
@@ -91,7 +131,7 @@ class ChatServiceTest {
 
             ChatResponse response = chatService.chat(1L, request);
 
-            assertThat(response.getAnswer()).isEqualTo("손익분기점은 63개입니다.");
+            assertThat(response.getAnswer()).isEqualTo("월 최소 63건을 달성해야 합니다.");
             assertThat(response.getTokensUsed()).isEqualTo(180);
 
             ArgumentCaptor<ChatLog> captor = ArgumentCaptor.forClass(ChatLog.class);
@@ -121,7 +161,7 @@ class ChatServiceTest {
 
             ChatResponse response = chatService.chat(1L, request);
 
-            assertThat(response.getAnswer()).contains("고정비");
+            assertThat(response.getAnswer()).contains("고정 지출");
             assertThat(response.getTokensUsed()).isZero();
             verify(llmClient, never()).chatWithUsage(anyString(), anyString());
         }
@@ -132,13 +172,24 @@ class ChatServiceTest {
     class SystemPrompt {
 
         @Test
-        @DisplayName("프로젝트 정보가 시스템 프롬프트에 포함됨")
-        void shouldContainProjectInfo() {
+        @DisplayName("프로젝트 정보가 크리에이터 용어로 시스템 프롬프트에 포함됨")
+        void shouldContainProjectInfoWithCreatorTerms() {
             User user = createUser(1L);
             Project project = createProject(10L, user);
 
-            String prompt = chatService.buildSystemPrompt(project);
+            given(projectAnalysisService.analyzeProject(10L, 1L))
+                    .willReturn(createAnalysisResponse());
 
+            String prompt = chatService.buildSystemPrompt(project, 1L);
+
+            // Creator terminology
+            assertThat(prompt).contains("건당 수익");
+            assertThat(prompt).contains("건당 비용");
+            assertThat(prompt).contains("월 고정 지출");
+            assertThat(prompt).contains("월 투입 시간");
+            assertThat(prompt).contains("본업 시급");
+
+            // Project data
             assertThat(prompt).contains("이모티콘 프로젝트");
             assertThat(prompt).contains("10000");
             assertThat(prompt).contains("2000");
@@ -146,6 +197,31 @@ class ChatServiceTest {
             assertThat(prompt).contains("8000");  // 공헌이익
             assertThat(prompt).contains("160");
             assertThat(prompt).contains("9860");
+
+            // Creator category
+            assertThat(prompt).contains("이모티콘 셀러");
+
+            // Analysis results
+            assertThat(prompt).contains("월 최소 건수(BEP)");
+            assertThat(prompt).contains("62.5");
+            assertThat(prompt).contains("실질 시급");
+        }
+
+        @Test
+        @DisplayName("분석 실패 시에도 기본 프로젝트 정보는 포함됨")
+        void shouldFallbackGracefullyOnAnalysisFailure() {
+            User user = createUser(1L);
+            Project project = createProject(10L, user);
+
+            given(projectAnalysisService.analyzeProject(anyLong(), anyLong()))
+                    .willThrow(new RuntimeException("DB error"));
+
+            String prompt = chatService.buildSystemPrompt(project, 1L);
+
+            assertThat(prompt).contains("이모티콘 프로젝트");
+            assertThat(prompt).contains("10000");
+            assertThat(prompt).contains("건당 수익");
+            assertThat(prompt).doesNotContain("=== 분석 결과 ===");
         }
     }
 
