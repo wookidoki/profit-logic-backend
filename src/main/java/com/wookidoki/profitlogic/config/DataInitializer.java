@@ -374,6 +374,13 @@ public class DataInitializer implements CommandLineRunner {
         seedTrendData(p11, u11);
         seedTrendData(p21, u21);
 
+        // ══════════════════════════════════════════
+        // 목표 추적 데이터 (대표 페르소나 3명)
+        // ══════════════════════════════════════════
+        p1.updateGoal(bd("500000"), "2026-06");   // 웹소설작가: 50만원 목표, 6월까지
+        p11.updateGoal(bd("3000000"), "2026-08"); // 핸드메이드 양초: 300만원 목표, 8월까지
+        p21.updateGoal(bd("10000000"), "2026-12"); // SaaS 개발자: 1000만원 목표, 12월까지
+
         log.info("[DataInitializer] 시드 데이터 생성 완료!");
         log.info("  관리자: admin@profitlogic.com / Test1234!");
         log.info("  페르소나: creator01~10, seller01~10, dev01~10 @test.com / Test1234!");

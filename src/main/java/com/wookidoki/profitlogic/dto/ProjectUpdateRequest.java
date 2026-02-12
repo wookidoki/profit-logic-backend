@@ -42,4 +42,9 @@ public class ProjectUpdateRequest {
 
     @NotNull(message = "공개여부는 필수입니다.")
     private Boolean isPublic;
+
+    @DecimalMin(value = "0", message = "목표 매출은 0 이상이어야 합니다.")
+    private BigDecimal targetRevenue;
+
+    private String targetMonth;
 }

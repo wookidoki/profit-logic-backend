@@ -23,6 +23,8 @@ public class ProjectResponse {
     private Integer workHours;
     private BigDecimal hourlyWage;
     private Boolean isPublic;
+    private BigDecimal targetRevenue;
+    private String targetMonth;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -36,6 +38,8 @@ public class ProjectResponse {
                 .workHours(project.getWorkHours())
                 .hourlyWage(project.getHourlyWage())
                 .isPublic(project.getIsPublic())
+                .targetRevenue(project.getTargetRevenue())
+                .targetMonth(project.getTargetMonth())
                 .createdAt(project.getCreatedAt())
                 .updatedAt(project.getUpdatedAt())
                 .build();
