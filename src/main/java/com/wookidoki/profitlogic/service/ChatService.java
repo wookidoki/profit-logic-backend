@@ -95,28 +95,119 @@ public class ChatService {
 
     private String generateRuleBasedAnswer(String question, Project project) {
         String q = question.toLowerCase();
+        java.math.BigDecimal cm = project.getPrice().subtract(project.getVariableCost());
+        boolean hasCm = cm.compareTo(java.math.BigDecimal.ZERO) > 0;
 
-        if (q.contains("손익분기") || q.contains("bep")) {
-            return String.format("현재 프로젝트 '%s'의 고정비는 %s원, 판매가는 %s원, 변동비는 %s원입니다. " +
-                            "손익분기점 분석을 위해 대시보드의 분석 기능을 이용해보세요.",
-                    project.getTitle(), project.getFixedCost(), project.getPrice(), project.getVariableCost());
+        // BEP 계산
+        if (q.contains("손익분기") || q.contains("bep") || q.contains("몇 개") || q.contains("몇개")) {
+            if (!hasCm) {
+                return String.format("프로젝트 '%s'의 공헌이익이 0 이하입니다. " +
+                        "판매가(%s원)가 변동비(%s원)보다 높아야 손익분기점을 계산할 수 있습니다. " +
+                        "가격을 올리거나 변동비를 줄이는 것을 추천합니다.",
+                        project.getTitle(), project.getPrice(), project.getVariableCost());
+            }
+            java.math.BigDecimal bep = project.getFixedCost()
+                    .divide(cm, 1, java.math.RoundingMode.HALF_UP);
+            return String.format("프로젝트 '%s'의 손익분기점(BEP)은 약 %s개입니다.\n\n" +
+                    "계산 근거:\n" +
+                    "- 판매가: %s원\n" +
+                    "- 변동비: %s원\n" +
+                    "- 공헌이익: %s원\n" +
+                    "- 고정비: %s원\n" +
+                    "- BEP = 고정비 ÷ 공헌이익 = %s ÷ %s = %s개\n\n" +
+                    "월 %s개 이상 판매하면 이익이 발생합니다.",
+                    project.getTitle(), bep,
+                    project.getPrice(), project.getVariableCost(), cm,
+                    project.getFixedCost(), project.getFixedCost(), cm, bep, bep);
         }
 
-        if (q.contains("시급") || q.contains("급여") || q.contains("임금")) {
-            return String.format("프로젝트 '%s'의 설정된 근무시간은 %d시간, 시급은 %s원입니다. " +
-                            "실질 시급(Shadow Wage)은 분석 결과에서 확인할 수 있습니다.",
-                    project.getTitle(), project.getWorkHours(), project.getHourlyWage());
+        // 실질 시급
+        if (q.contains("시급") || q.contains("급여") || q.contains("임금") || q.contains("shadow")) {
+            java.math.BigDecimal laborCost = project.getHourlyWage()
+                    .multiply(java.math.BigDecimal.valueOf(project.getWorkHours()));
+            return String.format("프로젝트 '%s'의 시급 분석입니다.\n\n" +
+                    "- 설정 시급: %s원/시간\n" +
+                    "- 월 근무시간: %d시간\n" +
+                    "- 월 인건비(기회비용): %s원\n\n" +
+                    "실질 시급은 실제 영업이익을 근무시간으로 나눈 값입니다. " +
+                    "대시보드 '종합 분석' 탭에서 정확한 실질 시급을 확인하실 수 있습니다.",
+                    project.getTitle(), project.getHourlyWage(),
+                    project.getWorkHours(), laborCost);
         }
 
-        if (q.contains("수익") || q.contains("이익") || q.contains("매출")) {
-            return String.format("프로젝트 '%s'의 판매가 %s원에서 변동비 %s원을 빼면 " +
-                            "단위당 공헌이익은 %s원입니다. 자세한 수익 분석은 대시보드를 확인해주세요.",
+        // 수익성/이익
+        if (q.contains("수익") || q.contains("이익") || q.contains("매출") || q.contains("돈")) {
+            java.math.BigDecimal cmRate = hasCm
+                    ? cm.multiply(java.math.BigDecimal.valueOf(100))
+                        .divide(project.getPrice(), 1, java.math.RoundingMode.HALF_UP)
+                    : java.math.BigDecimal.ZERO;
+            return String.format("프로젝트 '%s'의 수익 구조입니다.\n\n" +
+                    "- 판매가: %s원\n" +
+                    "- 변동비: %s원 (개당 원가)\n" +
+                    "- 공헌이익: %s원 (공헌이익률 %s%%)\n" +
+                    "- 월 고정비: %s원\n\n" +
+                    "%s",
                     project.getTitle(), project.getPrice(), project.getVariableCost(),
-                    project.getPrice().subtract(project.getVariableCost()));
+                    cm, cmRate, project.getFixedCost(),
+                    cmRate.compareTo(java.math.BigDecimal.valueOf(50)) > 0
+                        ? "공헌이익률이 높아서 좋은 수익 구조입니다!"
+                        : cmRate.compareTo(java.math.BigDecimal.valueOf(20)) < 0
+                            ? "공헌이익률이 낮습니다. 가격 인상이나 변동비 절감을 검토해보세요."
+                            : "보통 수준의 공헌이익률입니다. 판매량을 늘리면 수익이 개선됩니다.");
         }
 
-        return String.format("'%s' 프로젝트에 대해 궁금하신 점이 있으시군요. " +
-                        "손익분기점, 시급, 수익성 등 구체적인 키워드로 질문해주시면 더 정확한 답변을 드릴 수 있습니다.",
+        // 비용 관련
+        if (q.contains("비용") || q.contains("절감") || q.contains("줄") || q.contains("아끼")) {
+            return String.format("프로젝트 '%s'의 비용 구조를 분석해보겠습니다.\n\n" +
+                    "- 고정비: %s원/월 (매달 나가는 비용)\n" +
+                    "- 변동비: %s원/개 (판매할 때마다 드는 비용)\n\n" +
+                    "비용 절감 팁:\n" +
+                    "1. 고정비 절감: 구독 서비스 정리, 대안 도구 검토\n" +
+                    "2. 변동비 절감: 재료 대량 구매, 공정 효율화\n" +
+                    "3. '비용 상세' 탭에서 항목별 비용을 기록하면 더 정확한 분석이 가능합니다.",
+                    project.getTitle(), project.getFixedCost(), project.getVariableCost());
+        }
+
+        // 가격 관련
+        if (q.contains("가격") || q.contains("올려") || q.contains("인상") || q.contains("할인")) {
+            if (!hasCm) {
+                return "현재 판매가가 변동비보다 낮습니다. 가격 인상이 필수입니다.";
+            }
+            java.math.BigDecimal currentBep = project.getFixedCost()
+                    .divide(cm, 1, java.math.RoundingMode.HALF_UP);
+            java.math.BigDecimal newPrice = project.getPrice()
+                    .multiply(java.math.BigDecimal.valueOf(1.1));
+            java.math.BigDecimal newCm = newPrice.subtract(project.getVariableCost());
+            java.math.BigDecimal newBep = project.getFixedCost()
+                    .divide(newCm, 1, java.math.RoundingMode.HALF_UP);
+            return String.format("가격 시뮬레이션 결과입니다.\n\n" +
+                    "현재: 판매가 %s원 → BEP %s개\n" +
+                    "10%% 인상 시: 판매가 %s원 → BEP %s개\n\n" +
+                    "가격을 10%% 올리면 BEP가 %s개 줄어들어 더 빨리 이익이 발생합니다.\n" +
+                    "'시나리오 시뮬레이션' 기능에서 다양한 가격을 테스트해보세요.",
+                    project.getPrice(), currentBep,
+                    newPrice.setScale(0, java.math.RoundingMode.HALF_UP), newBep,
+                    currentBep.subtract(newBep));
+        }
+
+        // 시간 관련
+        if (q.contains("시간") || q.contains("작업") || q.contains("효율")) {
+            return String.format("프로젝트 '%s'의 시간 분석입니다.\n\n" +
+                    "- 월 %d시간 투입 중\n" +
+                    "- 하루 약 %.1f시간 (22일 기준)\n\n" +
+                    "'작업시간' 탭에서 일별 작업시간을 기록하면 " +
+                    "실제 투입 시간 대비 수익을 더 정확하게 분석할 수 있습니다.",
+                    project.getTitle(), project.getWorkHours(),
+                    project.getWorkHours() / 22.0);
+        }
+
+        return String.format("'%s' 프로젝트에 대해 궁금하신 점이 있으시군요.\n\n" +
+                "이런 질문을 해보세요:\n" +
+                "- \"손익분기점이 몇 개야?\"\n" +
+                "- \"실질 시급은 얼마야?\"\n" +
+                "- \"비용을 줄일 방법이 있을까?\"\n" +
+                "- \"가격을 올려도 될까?\"\n" +
+                "- \"수익 구조는 어때?\"",
                 project.getTitle());
     }
 }

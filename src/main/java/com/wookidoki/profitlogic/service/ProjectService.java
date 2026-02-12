@@ -46,6 +46,8 @@ public class ProjectService {
                 .workHours(request.getWorkHours())
                 .hourlyWage(request.getHourlyWage())
                 .isPublic(request.getIsPublic() != null ? request.getIsPublic() : false)
+                .creatorCategory(request.getCreatorCategory())
+                .scriptInputs(request.getScriptInputs())
                 .targetRevenue(request.getTargetRevenue())
                 .targetMonth(request.getTargetMonth())
                 .build();

@@ -4,6 +4,7 @@ import com.wookidoki.profitlogic.dto.CalculateRequest;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,28 +13,76 @@ public class RegexAiParseService implements AiParseService {
 
     @Override
     public CalculateRequest parse(String text) {
+        BigDecimal price = extract(text,
+                "판매가", "판매", "가격", "개당", "단가", "화당", "건당", "세트당",
+                "구독료", "구독", "월정액", "수익", "매출");
+        BigDecimal variableCost = extract(text,
+                "변동비", "재료비", "원가", "재료", "변동", "직접비", "제작비",
+                "외주비", "소모품", "수수료");
+        BigDecimal fixedCost = extract(text,
+                "고정비", "임대료", "월세", "고정", "렌트", "구독료비", "서버비",
+                "호스팅", "유지비", "월비용", "월 비용", "관리비");
+        BigDecimal hourlyWage = extract(text,
+                "시급", "시간당", "최저시급", "목표시급", "기대시급", "희망시급");
+
+        // 작업 시간: "하루 X시간" → X*22, 그냥 "XX시간" → 그대로
+        Integer workHours = extractWorkHours(text);
+        if (workHours == 0) workHours = 1;
+
+        // 목표이익 추출 or 시급*시간으로 자동 산출
+        BigDecimal targetProfit = extract(text,
+                "목표이익", "목표수익", "목표 이익", "목표 수익", "이익목표",
+                "목표매출", "목표 매출", "월수입", "월 수입");
+        if (targetProfit.compareTo(BigDecimal.ZERO) == 0
+                && hourlyWage.compareTo(BigDecimal.ZERO) > 0
+                && workHours > 0) {
+            targetProfit = hourlyWage.multiply(BigDecimal.valueOf(workHours));
+        }
+
         return CalculateRequest.builder()
-                .price(extract(text, "판매가", "판매", "가격", "개당", "단가"))
-                .variableCost(extract(text, "변동비", "재료비", "원가", "재료", "변동"))
-                .fixedCost(extract(text, "고정비", "임대료", "월세", "고정", "렌트"))
-                .workHours(extractInt(text, "근무시간", "근무", "작업시간", "시간"))
-                .hourlyWage(extract(text, "시급", "시간당"))
-                .targetProfit(extract(text, "목표이익", "목표수익", "목표 이익", "목표 수익", "이익목표"))
+                .price(price)
+                .variableCost(variableCost)
+                .fixedCost(fixedCost)
+                .workHours(workHours)
+                .hourlyWage(hourlyWage)
+                .targetProfit(targetProfit)
                 .build();
     }
 
     private BigDecimal extract(String text, String... keywords) {
         for (String keyword : keywords) {
             BigDecimal value = findNumberAfterKeyword(text, keyword);
-            if (value != null) {
+            if (value != null && value.compareTo(BigDecimal.ZERO) > 0) {
                 return value;
             }
         }
         return BigDecimal.ZERO;
     }
 
-    private Integer extractInt(String text, String... keywords) {
-        BigDecimal value = extract(text, keywords);
+    private Integer extractWorkHours(String text) {
+        // "하루 X시간" 패턴 → 월간으로 변환 (×22)
+        Pattern dailyPattern = Pattern.compile(
+                "하루\\s*(?:평균\\s*)?([0-9]+\\.?[0-9]*)\\s*시간",
+                Pattern.CASE_INSENSITIVE);
+        Matcher dailyMatcher = dailyPattern.matcher(text);
+        if (dailyMatcher.find()) {
+            BigDecimal daily = new BigDecimal(dailyMatcher.group(1));
+            return daily.multiply(BigDecimal.valueOf(22))
+                    .setScale(0, RoundingMode.HALF_UP).intValue();
+        }
+
+        // "월 XX시간" 패턴
+        Pattern monthlyPattern = Pattern.compile(
+                "(?:월|한달)\\s*(?:평균\\s*)?([0-9]+\\.?[0-9]*)\\s*시간",
+                Pattern.CASE_INSENSITIVE);
+        Matcher monthlyMatcher = monthlyPattern.matcher(text);
+        if (monthlyMatcher.find()) {
+            return new BigDecimal(monthlyMatcher.group(1))
+                    .setScale(0, RoundingMode.HALF_UP).intValue();
+        }
+
+        // 일반 키워드 기반
+        BigDecimal value = extract(text, "근무시간", "작업시간", "근무", "작업");
         return value.intValue();
     }
 

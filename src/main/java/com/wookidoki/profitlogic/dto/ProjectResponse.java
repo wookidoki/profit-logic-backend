@@ -23,6 +23,8 @@ public class ProjectResponse {
     private Integer workHours;
     private BigDecimal hourlyWage;
     private Boolean isPublic;
+    private String creatorCategory;
+    private String scriptInputs;
     private BigDecimal targetRevenue;
     private String targetMonth;
     private LocalDateTime createdAt;
@@ -38,6 +40,8 @@ public class ProjectResponse {
                 .workHours(project.getWorkHours())
                 .hourlyWage(project.getHourlyWage())
                 .isPublic(project.getIsPublic())
+                .creatorCategory(project.getCreatorCategory() != null ? project.getCreatorCategory().name() : null)
+                .scriptInputs(project.getScriptInputs())
                 .targetRevenue(project.getTargetRevenue())
                 .targetMonth(project.getTargetMonth())
                 .createdAt(project.getCreatedAt())

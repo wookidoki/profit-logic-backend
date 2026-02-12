@@ -1,5 +1,6 @@
 package com.wookidoki.profitlogic.dto;
 
+import com.wookidoki.profitlogic.domain.CreatorCategory;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -42,6 +43,10 @@ public class ProjectCreateRequest {
 
     @Builder.Default
     private Boolean isPublic = false;
+
+    private CreatorCategory creatorCategory;
+
+    private String scriptInputs;
 
     @DecimalMin(value = "0", message = "목표 매출은 0 이상이어야 합니다.")
     private BigDecimal targetRevenue;
