@@ -72,7 +72,7 @@ public class DataInitializer implements CommandLineRunner {
 
         // 1. 웹소설 작가 (고시간, 저비용, 회차당 저가)
         User u1 = createUser("creator01@test.com", encodedPw, "웹소설작가김", BizType.CREATOR);
-        Project p1 = createProject(u1, "웹소설 연재 수익 분석", "3000", "100", "50000", 160, "9860", true);
+        Project p1 = createProject(u1, "웹소설 연재 수익 분석", "3000", "100", "50000", 160, "9860", true, CreatorCategory.WEB_NOVEL);
         addCost(p1, CostCategory.TOOL_SUBSCRIPTION, "노트북 감가상각", "FIXED", "30000", null);
         addCost(p1, CostCategory.OTHER, "자료구매비", "VARIABLE", "5000", "월평균 참고서적");
         addTimeLog(p1, "원고 집필 (1~3화)", "8.0", -1, null);
@@ -81,14 +81,14 @@ public class DataInitializer implements CommandLineRunner {
 
         // 2. 이모티콘 작가 (고정비 낮음, 변동비 거의 0)
         User u2 = createUser("creator02@test.com", encodedPw, "이모티콘작가이", BizType.CREATOR);
-        Project p2 = createProject(u2, "카카오 이모티콘 세트", "2000", "0", "20000", 120, "9860", true);
+        Project p2 = createProject(u2, "카카오 이모티콘 세트", "2000", "0", "20000", 120, "9860", true, CreatorCategory.EMOTICON);
         addCost(p2, CostCategory.TOOL_SUBSCRIPTION, "프로크리에이트 구독", "FIXED", "12000", null);
         addTimeLog(p2, "캐릭터 디자인", "6.0", -1, "기본형 24종");
         addTimeLog(p2, "움직이는 이모티콘", "8.0", -2, "애니메이션 작업");
 
         // 3. 유튜브 크리에이터 (고정비 높음, 장비투자)
         User u3 = createUser("creator03@test.com", encodedPw, "유튜버박", BizType.CREATOR);
-        Project p3 = createProject(u3, "유튜브 채널 운영", "50000", "5000", "800000", 200, "9860", true);
+        Project p3 = createProject(u3, "유튜브 채널 운영", "50000", "5000", "800000", 200, "9860", true, CreatorCategory.SHORT_FORM);
         addCost(p3, CostCategory.SERVER, "클라우드 스토리지", "FIXED", "15000", "구글원 2TB");
         addCost(p3, CostCategory.TOOL_SUBSCRIPTION, "편집 소프트웨어", "FIXED", "25000", "프리미어 프로");
         addCost(p3, CostCategory.MARKETING, "썸네일 외주", "VARIABLE", "30000", "영상당 단가");
@@ -99,13 +99,13 @@ public class DataInitializer implements CommandLineRunner {
 
         // 4. 블로그 운영자 (광고수익, 저비용)
         User u4 = createUser("creator04@test.com", encodedPw, "블로거최", BizType.CREATOR);
-        Project p4 = createProject(u4, "네이버 블로그 광고 수익", "500", "0", "30000", 80, "9860", false);
+        Project p4 = createProject(u4, "네이버 블로그 광고 수익", "500", "0", "30000", 80, "9860", false, CreatorCategory.BLOG);
         addCost(p4, CostCategory.TOOL_SUBSCRIPTION, "유료 이미지 소스", "FIXED", "10000", null);
         addTimeLog(p4, "포스팅 작성", "2.0", -1, "일일 1포스팅");
 
         // 5. 웹툰 작가 (고시간, 중비용)
         User u5 = createUser("creator05@test.com", encodedPw, "웹툰작가정", BizType.CREATOR);
-        Project p5 = createProject(u5, "웹툰 연재 프로젝트", "5000", "200", "300000", 240, "9860", true);
+        Project p5 = createProject(u5, "웹툰 연재 프로젝트", "5000", "200", "300000", 240, "9860", true, CreatorCategory.WEB_NOVEL);
         addCost(p5, CostCategory.TOOL_SUBSCRIPTION, "클립스튜디오 라이선스", "FIXED", "8000", null);
         addCost(p5, CostCategory.OUTSOURCING, "배경 외주", "VARIABLE", "150000", "회당 배경 5컷");
         addTimeLog(p5, "콘티 작업", "4.0", -1, null);
@@ -121,7 +121,7 @@ public class DataInitializer implements CommandLineRunner {
 
         // 7. 숏폼 크리에이터 (틱톡/릴스)
         User u7 = createUser("creator07@test.com", encodedPw, "숏폼크리에이터윤", BizType.CREATOR);
-        Project p7 = createProject(u7, "틱톡 숏폼 채널", "20000", "1000", "150000", 100, "9860", true);
+        Project p7 = createProject(u7, "틱톡 숏폼 채널", "20000", "1000", "150000", 100, "9860", true, CreatorCategory.SHORT_FORM);
         addCost(p7, CostCategory.MARKETING, "인플루언서 콜라보", "VARIABLE", "50000", null);
         addTimeLog(p7, "촬영 + 편집", "3.0", -1, "일일 1~2편 제작");
 
@@ -246,7 +246,7 @@ public class DataInitializer implements CommandLineRunner {
 
         // 21. SaaS 개발자 (B2B)
         User u21 = createUser("dev01@test.com", encodedPw, "SaaS개발자김", BizType.DEVELOPER);
-        Project p21 = createProject(u21, "B2B 재고관리 SaaS", "50000", "2000", "3000000", 200, "30000", true);
+        Project p21 = createProject(u21, "B2B 재고관리 SaaS", "50000", "2000", "3000000", 200, "30000", true, CreatorCategory.INDIE_DEV);
         addCost(p21, CostCategory.SERVER, "AWS 서버비", "FIXED", "500000", "EC2+RDS+S3");
         addCost(p21, CostCategory.API_USAGE, "외부 API 연동비", "VARIABLE", "1000", "건당 과금");
         addCost(p21, CostCategory.TOOL_SUBSCRIPTION, "GitHub+Jira", "FIXED", "50000", null);
@@ -255,7 +255,7 @@ public class DataInitializer implements CommandLineRunner {
 
         // 22. 모바일 앱 개발자
         User u22 = createUser("dev02@test.com", encodedPw, "앱개발자박", BizType.DEVELOPER);
-        Project p22 = createProject(u22, "다이어트 트래킹 앱", "5000", "500", "1500000", 180, "25000", true);
+        Project p22 = createProject(u22, "다이어트 트래킹 앱", "5000", "500", "1500000", 180, "25000", true, CreatorCategory.INDIE_DEV);
         addCost(p22, CostCategory.SERVER, "Firebase", "FIXED", "100000", null);
         addCost(p22, CostCategory.API_USAGE, "ChatGPT API", "VARIABLE", "200", "식단 분석 건당");
         addCost(p22, CostCategory.OTHER, "앱스토어 개발자 등록", "FIXED", "10000", "연 12만/12");
@@ -281,7 +281,7 @@ public class DataInitializer implements CommandLineRunner {
 
         // 25. AI 챗봇 서비스 개발자
         User u25 = createUser("dev05@test.com", encodedPw, "AI개발자정", BizType.DEVELOPER);
-        Project p25 = createProject(u25, "AI 고객응대 챗봇", "100000", "15000", "5000000", 200, "35000", true);
+        Project p25 = createProject(u25, "AI 고객응대 챗봇", "100000", "15000", "5000000", 200, "35000", true, CreatorCategory.INDIE_DEV);
         addCost(p25, CostCategory.API_USAGE, "OpenAI API", "VARIABLE", "10000", "고객사당 월 토큰");
         addCost(p25, CostCategory.API_USAGE, "임베딩 DB", "VARIABLE", "5000", "Pinecone");
         addCost(p25, CostCategory.SERVER, "GCP 인프라", "FIXED", "800000", null);
@@ -299,7 +299,7 @@ public class DataInitializer implements CommandLineRunner {
 
         // 27. 게임 인디 개발자
         User u27 = createUser("dev07@test.com", encodedPw, "인디게임개발자윤", BizType.DEVELOPER);
-        Project p27 = createProject(u27, "모바일 퍼즐 게임", "3000", "0", "800000", 200, "12000", true);
+        Project p27 = createProject(u27, "모바일 퍼즐 게임", "3000", "0", "800000", 200, "12000", true, CreatorCategory.INDIE_DEV);
         addCost(p27, CostCategory.TOOL_SUBSCRIPTION, "Unity Pro", "FIXED", "50000", null);
         addCost(p27, CostCategory.OUTSOURCING, "사운드 외주", "FIXED", "200000", null);
         addCost(p27, CostCategory.MARKETING, "UA 광고비", "FIXED", "300000", "유저 획득");
@@ -331,6 +331,53 @@ public class DataInitializer implements CommandLineRunner {
         addCost(p30, CostCategory.TOOL_SUBSCRIPTION, "모니터링 도구", "FIXED", "50000", "Datadog");
         addTimeLog(p30, "모델 최적화", "4.0", -3, null);
         addTimeLog(p30, "API 엔드포인트 개발", "5.0", -1, null);
+
+        // ══════════════════════════════════════════
+        // 데모 계정 (평가/시연용)
+        // ══════════════════════════════════════════
+        String demoPw = passwordEncoder.encode("password123");
+        User demo = userRepository.save(User.builder()
+                .email("demo@profitlogic.com")
+                .password(demoPw)
+                .nickname("데모사용자")
+                .bizType(BizType.CREATOR)
+                .build());
+
+        // 데모 프로젝트 1: 웹소설 연재 (WEB_NOVEL)
+        Project demoP1 = createProject(demo, "판타지 웹소설 연재",
+                "3500", "200", "80000", 140, "9860", true, CreatorCategory.WEB_NOVEL);
+        addCost(demoP1, CostCategory.TOOL_SUBSCRIPTION, "노트북 감가상각", "FIXED", "40000", null);
+        addCost(demoP1, CostCategory.OTHER, "참고자료 구매", "VARIABLE", "8000", "월평균 참고서적");
+        addTimeLog(demoP1, "원고 집필", "6.0", -1, "주 3회 연재");
+        addTimeLog(demoP1, "퇴고 및 교정", "2.0", -2, null);
+        addTimeLog(demoP1, "플롯 구상", "3.0", -4, "다음 아크 설정");
+        demoP1.updateGoal(bd("700000"), "2026-09");
+
+        // 데모 프로젝트 2: 틱톡 숏폼 (SHORT_FORM)
+        Project demoP2 = createProject(demo, "틱톡 요리 숏폼 채널",
+                "25000", "3000", "200000", 100, "9860", true, CreatorCategory.SHORT_FORM);
+        addCost(demoP2, CostCategory.MARKETING, "인스타 광고", "FIXED", "100000", null);
+        addCost(demoP2, CostCategory.TOOL_SUBSCRIPTION, "편집 앱 구독", "FIXED", "15000", "CapCut Pro");
+        addCost(demoP2, CostCategory.MATERIAL, "식재료비", "VARIABLE", "3000", "영상당 재료");
+        addTimeLog(demoP2, "촬영 + 편집", "3.0", -1, "일일 1편 제작");
+        addTimeLog(demoP2, "기획 + 트렌드 리서치", "1.5", -2, null);
+        demoP2.updateGoal(bd("1500000"), "2026-07");
+
+        // 데모 프로젝트 3: 인디 SaaS (INDIE_DEV)
+        Project demoP3 = createProject(demo, "AI 일정관리 SaaS",
+                "9900", "1000", "1200000", 180, "20000", true, CreatorCategory.INDIE_DEV);
+        addCost(demoP3, CostCategory.SERVER, "AWS 서버비", "FIXED", "300000", "EC2+RDS");
+        addCost(demoP3, CostCategory.API_USAGE, "OpenAI API", "VARIABLE", "800", "사용자당 월 토큰");
+        addCost(demoP3, CostCategory.TOOL_SUBSCRIPTION, "GitHub+Notion", "FIXED", "30000", null);
+        addTimeLog(demoP3, "백엔드 개발", "5.0", -1, "신규 기능 스프린트");
+        addTimeLog(demoP3, "프론트엔드 개발", "4.0", -2, null);
+        addTimeLog(demoP3, "인프라 + 배포", "2.0", -4, null);
+        demoP3.updateGoal(bd("5000000"), "2026-12");
+
+        // 데모 프로젝트 트렌드 데이터
+        seedTrendData(demoP1, demo);
+        seedTrendData(demoP2, demo);
+        seedTrendData(demoP3, demo);
 
         // ── 기존 커뮤니티 게시글 (호환성) ──
         BoardPost creatorPost = boardPostRepository.save(BoardPost.builder()
@@ -383,6 +430,7 @@ public class DataInitializer implements CommandLineRunner {
 
         log.info("[DataInitializer] 시드 데이터 생성 완료!");
         log.info("  관리자: admin@profitlogic.com / Test1234!");
+        log.info("  데모: demo@profitlogic.com / password123 (프로젝트 3개, 카테고리 포함)");
         log.info("  페르소나: creator01~10, seller01~10, dev01~10 @test.com / Test1234!");
     }
 
@@ -404,6 +452,14 @@ public class DataInitializer implements CommandLineRunner {
     private Project createProject(User user, String title,
                                   String price, String variableCost, String fixedCost,
                                   int workHours, String hourlyWage, boolean isPublic) {
+        return createProject(user, title, price, variableCost, fixedCost,
+                workHours, hourlyWage, isPublic, null);
+    }
+
+    private Project createProject(User user, String title,
+                                  String price, String variableCost, String fixedCost,
+                                  int workHours, String hourlyWage, boolean isPublic,
+                                  CreatorCategory category) {
         return projectRepository.save(Project.builder()
                 .user(user)
                 .title(title)
@@ -413,6 +469,7 @@ public class DataInitializer implements CommandLineRunner {
                 .workHours(workHours)
                 .hourlyWage(bd(hourlyWage))
                 .isPublic(isPublic)
+                .creatorCategory(category)
                 .build());
     }
 
