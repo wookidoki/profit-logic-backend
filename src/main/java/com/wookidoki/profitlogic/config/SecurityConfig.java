@@ -39,6 +39,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/v1/community/posts").permitAll()
                         .requestMatchers(HttpMethod.GET, "/v1/community/posts/{postId}").permitAll()
                         .requestMatchers(HttpMethod.GET, "/v1/community/posts/{postId}/comments").permitAll()
+                        .requestMatchers("/v1/admin/**").hasAuthority("ROLE_ADMIN")
                         .anyRequest().authenticated()
                 )
                 .headers(headers ->

@@ -3,16 +3,19 @@ package com.wookidoki.profitlogic.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class LoginResponse {
+public class AdminUserResponse {
 
-    private String accessToken;
+    private Long id;
     private String email;
     private String nickname;
     private String role;
+    private String bizType;
+    private long projectCount;
+    private LocalDateTime createdAt;
 }
