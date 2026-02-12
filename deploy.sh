@@ -75,8 +75,15 @@ MYSQL_USER=profituser
 MYSQL_PASSWORD=ProfitLogic2026!User
 JWT_SECRET=cHJvZC1zZWNyZXQta2V5LWZvci1wcm9maXQtbG9naWMtYXBwbGljYXRpb24tMjAyNi1wcm9kdWN0aW9u
 SERVER_IP=35.89.105.181
+GEMINI_API_KEY=AIzaSyCn5NwuJw4RKslTDwIIr7RP2YhMkeZA8Ck
 ENVEOF
     echo ".env file created."
+fi
+
+# Ensure GEMINI_API_KEY is in .env (even if .env already exists)
+if ! grep -q "GEMINI_API_KEY" .env 2>/dev/null; then
+    echo "GEMINI_API_KEY=AIzaSyCn5NwuJw4RKslTDwIIr7RP2YhMkeZA8Ck" >> .env
+    echo "GEMINI_API_KEY added to .env"
 fi
 
 docker compose -f docker-compose.prod.yml down 2>/dev/null || true
