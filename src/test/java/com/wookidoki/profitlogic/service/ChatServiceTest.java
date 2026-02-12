@@ -182,29 +182,38 @@ class ChatServiceTest {
 
             String prompt = chatService.buildSystemPrompt(project, 1L);
 
+            // Section headers
+            assertThat(prompt).contains("=== 사이드 프로젝트 정보 ===");
+            assertThat(prompt).contains("=== Profit Logic 엔진 분석 결과 ===");
+
             // Creator terminology
             assertThat(prompt).contains("건당 수익");
             assertThat(prompt).contains("건당 비용");
+            assertThat(prompt).contains("건당 순수익");
             assertThat(prompt).contains("월 고정 지출");
             assertThat(prompt).contains("월 투입 시간");
-            assertThat(prompt).contains("본업 시급");
+            assertThat(prompt).contains("본업 시급(기회비용)");
 
             // Project data
             assertThat(prompt).contains("이모티콘 프로젝트");
             assertThat(prompt).contains("10000");
             assertThat(prompt).contains("2000");
             assertThat(prompt).contains("500000");
-            assertThat(prompt).contains("8000");  // 공헌이익
+            assertThat(prompt).contains("8000");  // 건당 순수익
             assertThat(prompt).contains("160");
             assertThat(prompt).contains("9860");
+            assertThat(prompt).contains("하루 약");  // daily hours
 
-            // Creator category
+            // Creator category context
             assertThat(prompt).contains("이모티콘 셀러");
+            assertThat(prompt).contains("이 유형의 특성");
+            assertThat(prompt).contains("승인률");  // EMOTICON-specific context
 
             // Analysis results
-            assertThat(prompt).contains("월 최소 건수(BEP)");
+            assertThat(prompt).contains("월 최소 작업량(BEP)");
             assertThat(prompt).contains("62.5");
             assertThat(prompt).contains("실질 시급");
+            assertThat(prompt).contains("본업 시급 대비");
         }
 
         @Test
@@ -221,7 +230,8 @@ class ChatServiceTest {
             assertThat(prompt).contains("이모티콘 프로젝트");
             assertThat(prompt).contains("10000");
             assertThat(prompt).contains("건당 수익");
-            assertThat(prompt).doesNotContain("=== 분석 결과 ===");
+            assertThat(prompt).contains("=== 사이드 프로젝트 정보 ===");
+            assertThat(prompt).doesNotContain("=== Profit Logic 엔진 분석 결과 ===");
         }
     }
 

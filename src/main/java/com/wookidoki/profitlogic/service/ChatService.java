@@ -89,62 +89,117 @@ public class ChatService {
 
     String buildSystemPrompt(Project project, Long userId) {
         BigDecimal cm = project.getPrice().subtract(project.getVariableCost());
+        double dailyHours = project.getWorkHours() / 22.0;
 
         StringBuilder sb = new StringBuilder();
         sb.append(PromptTemplates.FINANCIAL_ADVISOR);
         sb.append("\n\n");
 
-        // Creator category context
-        if (project.getCreatorCategory() != null) {
-            CreatorCategory cat = project.getCreatorCategory();
-            sb.append("=== 크리에이터 유형 ===\n");
-            sb.append("유형: ").append(cat.getDisplayName()).append("\n");
-            sb.append("설명: ").append(cat.getDescription()).append("\n\n");
-        }
-
-        // Project financial data
-        sb.append("=== 현재 프로젝트 정보 ===\n");
+        // === 사이드 프로젝트 정보 ===
+        sb.append("=== 사이드 프로젝트 정보 ===\n");
         sb.append("프로젝트명: ").append(project.getTitle()).append("\n");
+        if (project.getCreatorCategory() != null) {
+            sb.append("크리에이터 유형: ").append(project.getCreatorCategory().getDisplayName()).append("\n");
+        }
         sb.append("건당 수익: ").append(project.getPrice().toPlainString()).append("원\n");
         sb.append("건당 비용: ").append(project.getVariableCost().toPlainString()).append("원\n");
+        sb.append("건당 순수익: ").append(cm.toPlainString()).append("원\n");
         sb.append("월 고정 지출: ").append(project.getFixedCost().toPlainString()).append("원\n");
-        sb.append("공헌이익: ").append(cm.toPlainString()).append("원\n");
-        sb.append("월 투입 시간: ").append(project.getWorkHours()).append("시간\n");
-        sb.append("본업 시급: ").append(project.getHourlyWage().toPlainString()).append("원\n");
+        sb.append("월 투입 시간: ").append(project.getWorkHours())
+                .append("시간 (하루 약 ").append(String.format("%.1f", dailyHours)).append("시간)\n");
+        sb.append("본업 시급(기회비용): ").append(project.getHourlyWage().toPlainString()).append("원\n");
 
-        // Enriched analysis data
+        // === Profit Logic 엔진 분석 결과 ===
         try {
             ProjectAnalysisResponse analysis = projectAnalysisService.analyzeProject(
                     project.getId(), userId);
 
-            sb.append("\n=== 분석 결과 ===\n");
+            sb.append("\n=== Profit Logic 엔진 분석 결과 ===\n");
 
             if (analysis.getBep() != null) {
-                sb.append("월 최소 건수(BEP): ").append(analysis.getBep().getBep().toPlainString()).append("건\n");
+                sb.append("월 최소 작업량(BEP): ").append(analysis.getBep().getBep().toPlainString()).append("건\n");
             }
 
             if (analysis.getShadowWage() != null) {
-                sb.append("실질 시급: ").append(analysis.getShadowWage().getRealShadowWage().toPlainString()).append("원\n");
+                BigDecimal realWage = analysis.getShadowWage().getRealShadowWage();
+                sb.append("실질 시급: ").append(realWage.toPlainString()).append("원\n");
+
+                // 본업 시급 대비 비율
+                if (project.getHourlyWage().compareTo(BigDecimal.ZERO) > 0) {
+                    BigDecimal wageRatio = realWage.multiply(HUNDRED)
+                            .divide(project.getHourlyWage(), 1, RoundingMode.HALF_UP);
+                    sb.append("본업 시급 대비: ").append(wageRatio.toPlainString()).append("%\n");
+                }
+
                 sb.append("최저임금 대비: ").append(analysis.getShadowWage().getMinimumWageRatio().toPlainString()).append("%\n");
-                sb.append("실제 시간 기록 여부: ").append(analysis.getShadowWage().isHasTimeData() ? "있음" : "없음").append("\n");
+                sb.append("실제 시간 기록: ").append(analysis.getShadowWage().isHasTimeData() ? "있음" : "없음 (설정값 기준 추정)").append("\n");
             }
 
-            if (analysis.getCostBreakdown() != null) {
-                sb.append("총 고정 지출(상세): ").append(analysis.getCostBreakdown().getTotalFixedCost().toPlainString()).append("원\n");
-                sb.append("총 건당 비용(상세): ").append(analysis.getCostBreakdown().getTotalVariableCost().toPlainString()).append("원\n");
+            if (analysis.getCostBreakdown() != null
+                    && analysis.getCostBreakdown().getTotalCost().compareTo(BigDecimal.ZERO) > 0) {
+                sb.append("비용 구조 요약: 고정 ").append(analysis.getCostBreakdown().getTotalFixedCost().toPlainString())
+                        .append("원 + 건당 ").append(analysis.getCostBreakdown().getTotalVariableCost().toPlainString()).append("원\n");
             }
 
             if (analysis.getActionCards() != null && !analysis.getActionCards().isEmpty()) {
                 sb.append("\n=== 주요 인사이트 ===\n");
                 for (ActionCardDto card : analysis.getActionCards()) {
-                    sb.append("- [").append(card.getType()).append("] ").append(card.getTitle()).append("\n");
+                    sb.append("- [").append(card.getType()).append("] ").append(card.getTitle())
+                            .append(": ").append(card.getDescription()).append("\n");
                 }
             }
         } catch (Exception e) {
             log.debug("분석 데이터 로드 실패, 기본 프로젝트 정보만 사용: {}", e.getMessage());
         }
 
+        // === 목표 정보 ===
+        if (project.getTargetRevenue() != null && project.getTargetRevenue().compareTo(BigDecimal.ZERO) > 0) {
+            sb.append("\n=== 목표 정보 ===\n");
+            sb.append("목표 월 수익: ").append(project.getTargetRevenue().toPlainString()).append("원\n");
+            if (project.getTargetMonth() != null) {
+                sb.append("목표 시점: ").append(project.getTargetMonth()).append("\n");
+            }
+        }
+
+        // === 크리에이터 유형별 맥락 ===
+        if (project.getCreatorCategory() != null) {
+            sb.append("\n=== 이 유형의 특성 (참고 맥락) ===\n");
+            sb.append(getCategoryContext(project.getCreatorCategory()));
+        }
+
         return sb.toString();
+    }
+
+    private static final BigDecimal HUNDRED = new BigDecimal("100");
+
+    private String getCategoryContext(CreatorCategory category) {
+        return switch (category) {
+            case WEB_NOVEL -> """
+                    - 회차 단위 수익, 연재 주기가 수입 주기
+                    - 유료 전환율과 독자 유지율이 실질 시급 결정
+                    - 작업 속도(시간당 글자 수) 개선이 시급 향상의 핵심
+                    """;
+            case SHORT_FORM -> """
+                    - 조회수 기반 수익, 건당 수익 변동 큼
+                    - 촬영+편집 시간 대비 수익 효율이 핵심
+                    - 협찬/브랜디드가 광고보다 단가 높은 경우 많음
+                    """;
+            case EMOTICON -> """
+                    - 세트 단위, 승인되면 스톡형 수동 수익
+                    - 제작 시간 집중 후 장기 회수 모델
+                    - 승인률이 시간 효율에 큰 영향
+                    """;
+            case BLOG -> """
+                    - 포스팅 누적 → 트래픽 → 수익의 복리 구조
+                    - 초기 수익 낮지만 장기적 시간당 효율 상승
+                    - SEO 투자가 6개월~1년 후 수익으로 전환
+                    """;
+            case INDIE_DEV -> """
+                    - 초기 개발은 수익 0, 시간 투자만 존재
+                    - 런칭 후 MRR이 핵심 지표
+                    - 본업 시급 대비 "언제 BEP 도달하나"가 판단 기준
+                    """;
+        };
     }
 
     private String generateRuleBasedAnswer(String question, Project project) {
