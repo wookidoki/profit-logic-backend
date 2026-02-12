@@ -45,12 +45,13 @@ public class AuthService {
             throw new InvalidCredentialsException();
         }
 
-        String token = jwtTokenProvider.createToken(user.getId(), user.getEmail());
+        String token = jwtTokenProvider.createToken(user.getId(), user.getEmail(), user.getRole().name());
 
         return LoginResponse.builder()
                 .accessToken(token)
                 .email(user.getEmail())
                 .nickname(user.getNickname())
+                .role(user.getRole().name())
                 .build();
     }
 }

@@ -695,4 +695,197 @@ class PersonaE2eIntegrationTest {
             assertThat(root.get("message").asText()).contains("팔수록 손해");
         }
     }
+
+    // ══════════════════════════════════════════════════
+    // Type C - 기술 집약형 (SaaS 개발자, DEVELOPER)
+    // ══════════════════════════════════════════════════
+    @Nested
+    @DisplayName("Type C - 기술 집약형 (SaaS 개발자)")
+    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class TypeC_Developer {
+
+        private String token;
+        private Long projectId1;
+        private Long projectId2;
+
+        static final String EMAIL = "saasdev@example.com";
+        static final String PASSWORD = "SaasDev1234!";
+        static final String NICKNAME = "SaaS개발자";
+
+        @Test @Order(1)
+        @DisplayName("1. 회원가입 + 로그인")
+        void signupAndLogin() throws Exception {
+            this.token = PersonaE2eIntegrationTest.this.signupAndLogin(EMAIL, PASSWORD, NICKNAME);
+            assertThat(token).isNotBlank();
+        }
+
+        @Test @Order(2)
+        @DisplayName("2. 프로젝트 생성 - B2B SaaS (고정비 높음, 변동비 낮음)")
+        void createProject() throws Exception {
+            Map<String, Object> body = Map.of(
+                    "title", "B2B 재고관리 SaaS",
+                    "price", 50000, "variable_cost", 2000, "fixed_cost", 3000000,
+                    "work_hours", 200, "hourly_wage", 30000, "is_public", true
+            );
+            ResponseEntity<String> resp = restTemplate.exchange(url("/v1/projects"),
+                    HttpMethod.POST, new HttpEntity<>(body, authHeaders(token)), String.class);
+
+            assertThat(resp.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+            this.projectId1 = parseData(resp).get("id").asLong();
+        }
+
+        @Test @Order(3)
+        @DisplayName("3. 손익분석 - SaaS 특성: BEP=63 (고정비 높음)")
+        void calculate() throws Exception {
+            Map<String, Object> body = Map.of(
+                    "price", 50000, "variable_cost", 2000, "fixed_cost", 3000000,
+                    "work_hours", 200, "hourly_wage", 30000, "target_profit", 10000000
+            );
+            ResponseEntity<String> resp = restTemplate.exchange(url("/v1/analysis/calculate"),
+                    HttpMethod.POST, new HttpEntity<>(body, jsonHeaders()), String.class);
+
+            assertThat(resp.getStatusCode()).isEqualTo(HttpStatus.OK);
+            JsonNode data = parseData(resp);
+
+            assertThat(data.get("break_even_point").decimalValue())
+                    .isEqualByComparingTo(new BigDecimal("63"));
+            assertThat(data.get("contribution_margin").decimalValue())
+                    .isEqualByComparingTo(new BigDecimal("48000"));
+            assertThat(data.get("is_viable").asBoolean()).isTrue();
+        }
+
+        @Test @Order(4)
+        @DisplayName("4. 두 번째 프로젝트 생성")
+        void createSecondProject() throws Exception {
+            Map<String, Object> body = Map.of(
+                    "title", "모바일 앱 부업",
+                    "price", 5000, "variable_cost", 500, "fixed_cost", 1500000,
+                    "work_hours", 80, "hourly_wage", 25000, "is_public", false
+            );
+            ResponseEntity<String> resp = restTemplate.exchange(url("/v1/projects"),
+                    HttpMethod.POST, new HttpEntity<>(body, authHeaders(token)), String.class);
+            assertThat(resp.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+            this.projectId2 = parseData(resp).get("id").asLong();
+        }
+
+        @Test @Order(5)
+        @DisplayName("5. 프로젝트 목록 → 2개 확인")
+        void listProjects() throws Exception {
+            JsonNode data = parseData(restTemplate.exchange(url("/v1/projects"),
+                    HttpMethod.GET, new HttpEntity<>(authHeaders(token)), String.class));
+            assertThat(data.size()).isEqualTo(2);
+        }
+
+        @Test @Order(6)
+        @DisplayName("6. 가격 변경 시뮬레이션 - 가격 인상 시 BEP 하락 확인")
+        void priceSimulation() throws Exception {
+            // 가격 70000으로 인상 시 BEP 감소
+            Map<String, Object> body = Map.of(
+                    "price", 70000, "variable_cost", 2000, "fixed_cost", 3000000,
+                    "work_hours", 200, "hourly_wage", 30000, "target_profit", 10000000
+            );
+            ResponseEntity<String> resp = restTemplate.exchange(url("/v1/analysis/calculate"),
+                    HttpMethod.POST, new HttpEntity<>(body, jsonHeaders()), String.class);
+
+            JsonNode data = parseData(resp);
+            BigDecimal newBep = data.get("break_even_point").decimalValue();
+            // 가격 인상 → BEP 감소 (63 → 45)
+            assertThat(newBep).isLessThan(new BigDecimal("63"));
+        }
+
+        @Test @Order(7)
+        @DisplayName("7. 리소스 정리")
+        void cleanup() throws Exception {
+            restTemplate.exchange(url("/v1/projects/" + projectId2),
+                    HttpMethod.DELETE, new HttpEntity<>(authHeaders(token)), String.class);
+            restTemplate.exchange(url("/v1/projects/" + projectId1),
+                    HttpMethod.DELETE, new HttpEntity<>(authHeaders(token)), String.class);
+
+            JsonNode data = parseData(restTemplate.exchange(url("/v1/projects"),
+                    HttpMethod.GET, new HttpEntity<>(authHeaders(token)), String.class));
+            assertThat(data.size()).isEqualTo(0);
+        }
+    }
+
+    // ══════════════════════════════════════════════════
+    // Type D - 관리자 시나리오
+    // ══════════════════════════════════════════════════
+    @Nested
+    @DisplayName("Type D - 관리자 시나리오")
+    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class TypeD_Admin {
+
+        private String adminToken;
+        private String userToken;
+        private Long userId;
+        private Long userPostId;
+
+        static final String ADMIN_EMAIL = "admin-test@profitlogic.com";
+        static final String ADMIN_PASSWORD = "AdminTest1234!";
+        static final String USER_EMAIL = "target-user@test.com";
+        static final String USER_PASSWORD = "UserPass1234!";
+
+        @Test @Order(1)
+        @DisplayName("1. 관리자 + 일반 사용자 생성")
+        void setup() throws Exception {
+            // 일반 사용자 생성 (signupAndLogin 으로)
+            userToken = PersonaE2eIntegrationTest.this.signupAndLogin(
+                    USER_EMAIL, USER_PASSWORD, "삭제대상유저");
+            assertThat(userToken).isNotBlank();
+
+            // 일반 사용자의 게시글 작성
+            Map<String, Object> postBody = Map.of(
+                    "title", "관리자에 의해 삭제될 게시글",
+                    "content", "이 게시글은 관리자가 삭제할 예정입니다."
+            );
+            ResponseEntity<String> postResp = restTemplate.exchange(url("/v1/community/posts"),
+                    HttpMethod.POST, new HttpEntity<>(postBody, authHeaders(userToken)), String.class);
+            userPostId = parseData(postResp).get("id").asLong();
+        }
+
+        @Test @Order(2)
+        @DisplayName("2. 일반 사용자 로그인 시 role=ROLE_USER 확인")
+        void userRoleCheck() throws Exception {
+            Map<String, Object> body = Map.of("email", USER_EMAIL, "password", USER_PASSWORD);
+            ResponseEntity<String> resp = restTemplate.exchange(url("/v1/auth/login"),
+                    HttpMethod.POST, new HttpEntity<>(body, jsonHeaders()), String.class);
+
+            JsonNode data = parseData(resp);
+            assertThat(data.get("role").asText()).isEqualTo("ROLE_USER");
+        }
+
+        @Test @Order(3)
+        @DisplayName("3. 일반 사용자가 관리자 API 호출 → 403")
+        void userCannotAccessAdmin() {
+            ResponseEntity<String> resp = restTemplate.exchange(url("/v1/admin/stats"),
+                    HttpMethod.GET, new HttpEntity<>(authHeaders(userToken)), String.class);
+            assertThat(resp.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+        }
+
+        @Test @Order(4)
+        @DisplayName("4. 미인증 상태에서 관리자 API 호출 → 403")
+        void unauthenticatedCannotAccessAdmin() {
+            ResponseEntity<String> resp = restTemplate.exchange(url("/v1/admin/stats"),
+                    HttpMethod.GET, new HttpEntity<>(jsonHeaders()), String.class);
+            assertThat(resp.getStatusCode().value()).isIn(401, 403);
+        }
+
+        @Test @Order(5)
+        @DisplayName("5. 일반 사용자가 관리자 사용자 삭제 API → 403")
+        void userCannotDeleteUser() {
+            ResponseEntity<String> resp = restTemplate.exchange(url("/v1/admin/users/999"),
+                    HttpMethod.DELETE, new HttpEntity<>(authHeaders(userToken)), String.class);
+            assertThat(resp.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+        }
+
+        @Test @Order(6)
+        @DisplayName("6. 일반 사용자가 관리자 게시글 삭제 API → 403")
+        void userCannotAdminDeletePost() {
+            ResponseEntity<String> resp = restTemplate.exchange(url("/v1/admin/posts/" + userPostId),
+                    HttpMethod.DELETE, new HttpEntity<>(authHeaders(userToken)), String.class);
+            assertThat(resp.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+        }
+    }
 }

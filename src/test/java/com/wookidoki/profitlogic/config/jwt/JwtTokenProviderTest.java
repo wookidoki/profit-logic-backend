@@ -25,7 +25,7 @@ class JwtTokenProviderTest {
         @Test
         @DisplayName("유효한 토큰을 생성한다")
         void shouldCreateToken() {
-            String token = jwtTokenProvider.createToken(1L, "test@example.com");
+            String token = jwtTokenProvider.createToken(1L, "test@example.com", "ROLE_USER");
 
             assertNotNull(token);
             assertFalse(token.isEmpty());
@@ -39,7 +39,7 @@ class JwtTokenProviderTest {
         @Test
         @DisplayName("유효한 토큰은 true를 반환한다")
         void shouldReturnTrueForValidToken() {
-            String token = jwtTokenProvider.createToken(1L, "test@example.com");
+            String token = jwtTokenProvider.createToken(1L, "test@example.com", "ROLE_USER");
 
             assertTrue(jwtTokenProvider.validateToken(token));
         }
@@ -64,7 +64,7 @@ class JwtTokenProviderTest {
         @Test
         @DisplayName("토큰에서 userId를 추출한다")
         void shouldExtractUserId() {
-            String token = jwtTokenProvider.createToken(42L, "test@example.com");
+            String token = jwtTokenProvider.createToken(42L, "test@example.com", "ROLE_USER");
 
             assertEquals(42L, jwtTokenProvider.getUserId(token));
         }
@@ -72,9 +72,17 @@ class JwtTokenProviderTest {
         @Test
         @DisplayName("토큰에서 email을 추출한다")
         void shouldExtractEmail() {
-            String token = jwtTokenProvider.createToken(1L, "test@example.com");
+            String token = jwtTokenProvider.createToken(1L, "test@example.com", "ROLE_USER");
 
             assertEquals("test@example.com", jwtTokenProvider.getEmail(token));
+        }
+
+        @Test
+        @DisplayName("토큰에서 role을 추출한다")
+        void shouldExtractRole() {
+            String token = jwtTokenProvider.createToken(1L, "test@example.com", "ROLE_ADMIN");
+
+            assertEquals("ROLE_ADMIN", jwtTokenProvider.getRole(token));
         }
     }
 }

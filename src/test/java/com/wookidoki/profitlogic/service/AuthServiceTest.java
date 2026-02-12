@@ -97,13 +97,14 @@ class AuthServiceTest {
 
             given(userRepository.findByEmail("test@example.com")).willReturn(Optional.of(user));
             given(passwordEncoder.matches("password123", "encodedPassword")).willReturn(true);
-            given(jwtTokenProvider.createToken(1L, "test@example.com")).willReturn("jwt-token");
+            given(jwtTokenProvider.createToken(1L, "test@example.com", "ROLE_USER")).willReturn("jwt-token");
 
             LoginResponse response = authService.login(request);
 
             assertEquals("jwt-token", response.getAccessToken());
             assertEquals("test@example.com", response.getEmail());
             assertEquals("테스터", response.getNickname());
+            assertEquals("ROLE_USER", response.getRole());
         }
 
         @Test
