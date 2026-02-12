@@ -45,6 +45,7 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRATION: 86400000
       CORS_ALLOWED_ORIGINS: http://${SERVER_IP},http://${SERVER_IP}:80
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
     networks:
       - profit-network
 

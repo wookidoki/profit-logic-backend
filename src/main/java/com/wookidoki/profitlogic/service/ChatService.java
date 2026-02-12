@@ -49,11 +49,16 @@ public class ChatService {
         int tokensUsed = 0;
 
         if (llmClient.isAvailable()) {
-            String systemPrompt = buildSystemPrompt(project);
-            LlmResponse llmResponse = llmClient.chatWithUsage(systemPrompt, request.getQuestion());
-            answer = llmResponse.getContent();
-            tokensUsed = llmResponse.getTotalTokens();
-            log.debug("LLM 응답 완료 - 프로젝트: {}, 토큰: {}", project.getTitle(), tokensUsed);
+            try {
+                String systemPrompt = buildSystemPrompt(project);
+                LlmResponse llmResponse = llmClient.chatWithUsage(systemPrompt, request.getQuestion());
+                answer = llmResponse.getContent();
+                tokensUsed = llmResponse.getTotalTokens();
+                log.info("LLM 응답 완료 - 프로젝트: {}, 토큰: {}", project.getTitle(), tokensUsed);
+            } catch (Exception e) {
+                log.warn("LLM 호출 실패, 규칙 기반 폴백 - 원인: {}", e.getMessage());
+                answer = generateRuleBasedAnswer(request.getQuestion(), project);
+            }
         } else {
             answer = generateRuleBasedAnswer(request.getQuestion(), project);
             log.debug("규칙 기반 응답 - LLM 미설정");
