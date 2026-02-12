@@ -27,7 +27,6 @@ public class RegexAiParseService implements AiParseService {
 
         // 작업 시간: "하루 X시간" → X*22, 그냥 "XX시간" → 그대로
         Integer workHours = extractWorkHours(text);
-        if (workHours == 0) workHours = 1;
 
         // 목표이익 추출 or 시급*시간으로 자동 산출
         BigDecimal targetProfit = extract(text,
