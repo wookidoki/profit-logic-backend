@@ -82,6 +82,8 @@ public class DashboardService {
                         .contributionMarginRate(marginRate)
                         .status(status)
                         .topActionCard(topCard)
+                        .creatorCategory(project.getCreatorCategory() != null
+                                ? project.getCreatorCategory().name() : null)
                         .build());
 
                 totalRevenue = totalRevenue.add(price.multiply(bep));
@@ -99,6 +101,8 @@ public class DashboardService {
                         .contributionMarginRate(BigDecimal.ZERO)
                         .status("NO_DATA")
                         .topActionCard(null)
+                        .creatorCategory(project.getCreatorCategory() != null
+                                ? project.getCreatorCategory().name() : null)
                         .build());
             }
         }

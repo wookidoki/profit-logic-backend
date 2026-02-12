@@ -18,4 +18,5 @@ public class ProjectInsightDto {
     private BigDecimal contributionMarginRate;
     private String status;
     private ActionCardDto topActionCard;
+    private String creatorCategory;
 }
