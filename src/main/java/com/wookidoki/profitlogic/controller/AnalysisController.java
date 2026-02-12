@@ -1,8 +1,8 @@
 package com.wookidoki.profitlogic.controller;
 
 import com.wookidoki.profitlogic.common.ResponseData;
-import com.wookidoki.profitlogic.dto.CalculateRequest;
-import com.wookidoki.profitlogic.dto.CalculateResponse;
+import com.wookidoki.profitlogic.dto.finance.CalculateRequest;
+import com.wookidoki.profitlogic.dto.finance.CalculateResponse;
 import com.wookidoki.profitlogic.service.CalculationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

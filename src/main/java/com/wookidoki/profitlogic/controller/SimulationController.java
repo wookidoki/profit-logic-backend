@@ -1,8 +1,8 @@
 package com.wookidoki.profitlogic.controller;
 
 import com.wookidoki.profitlogic.common.ResponseData;
-import com.wookidoki.profitlogic.dto.SimulationCreateRequest;
-import com.wookidoki.profitlogic.dto.SimulationResponse;
+import com.wookidoki.profitlogic.dto.simulation.SimulationCreateRequest;
+import com.wookidoki.profitlogic.dto.simulation.SimulationResponse;
 import com.wookidoki.profitlogic.service.SimulationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

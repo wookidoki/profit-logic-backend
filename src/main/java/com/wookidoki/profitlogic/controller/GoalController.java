@@ -1,9 +1,9 @@
 package com.wookidoki.profitlogic.controller;
 
 import com.wookidoki.profitlogic.common.ResponseData;
-import com.wookidoki.profitlogic.dto.GoalProgressResponse;
-import com.wookidoki.profitlogic.dto.GoalUpdateRequest;
-import com.wookidoki.profitlogic.dto.ProjectResponse;
+import com.wookidoki.profitlogic.dto.goal.GoalProgressResponse;
+import com.wookidoki.profitlogic.dto.goal.GoalUpdateRequest;
+import com.wookidoki.profitlogic.dto.project.ProjectResponse;
 import com.wookidoki.profitlogic.service.GoalService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

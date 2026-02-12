@@ -1,7 +1,7 @@
 package com.wookidoki.profitlogic.controller;
 
 import com.wookidoki.profitlogic.common.ResponseData;
-import com.wookidoki.profitlogic.dto.DashboardSummaryResponse;
+import com.wookidoki.profitlogic.dto.dashboard.DashboardSummaryResponse;
 import com.wookidoki.profitlogic.service.DashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

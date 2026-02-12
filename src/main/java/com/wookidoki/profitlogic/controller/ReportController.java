@@ -1,7 +1,7 @@
 package com.wookidoki.profitlogic.controller;
 
 import com.wookidoki.profitlogic.common.ResponseData;
-import com.wookidoki.profitlogic.dto.ReportResponse;
+import com.wookidoki.profitlogic.dto.report.ReportResponse;
 import com.wookidoki.profitlogic.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -1,8 +1,8 @@
 package com.wookidoki.profitlogic.controller;
 
 import com.wookidoki.profitlogic.common.ResponseData;
-import com.wookidoki.profitlogic.dto.TimeLogCreateRequest;
-import com.wookidoki.profitlogic.dto.TimeLogResponse;
+import com.wookidoki.profitlogic.dto.timelog.TimeLogCreateRequest;
+import com.wookidoki.profitlogic.dto.timelog.TimeLogResponse;
 import com.wookidoki.profitlogic.service.TimeLogService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

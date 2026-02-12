@@ -1,8 +1,8 @@
 package com.wookidoki.profitlogic.controller;
 
 import com.wookidoki.profitlogic.common.ResponseData;
-import com.wookidoki.profitlogic.dto.PriceSimulationDto;
-import com.wookidoki.profitlogic.dto.ProjectAnalysisResponse;
+import com.wookidoki.profitlogic.dto.finance.PriceSimulationDto;
+import com.wookidoki.profitlogic.dto.project.ProjectAnalysisResponse;
 import com.wookidoki.profitlogic.service.ProjectAnalysisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

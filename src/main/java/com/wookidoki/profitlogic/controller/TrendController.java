@@ -1,7 +1,7 @@
 package com.wookidoki.profitlogic.controller;
 
 import com.wookidoki.profitlogic.common.ResponseData;
-import com.wookidoki.profitlogic.dto.MonthlyTrendResponse;
+import com.wookidoki.profitlogic.dto.trend.MonthlyTrendResponse;
 import com.wookidoki.profitlogic.service.TrendService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

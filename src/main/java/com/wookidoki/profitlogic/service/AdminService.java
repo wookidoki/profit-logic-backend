@@ -1,8 +1,8 @@
 package com.wookidoki.profitlogic.service;
 
 import com.wookidoki.profitlogic.domain.User;
-import com.wookidoki.profitlogic.dto.AdminStatsResponse;
-import com.wookidoki.profitlogic.dto.AdminUserResponse;
+import com.wookidoki.profitlogic.dto.admin.AdminStatsResponse;
+import com.wookidoki.profitlogic.dto.admin.AdminUserResponse;
 import com.wookidoki.profitlogic.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;

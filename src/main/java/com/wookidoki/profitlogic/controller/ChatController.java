@@ -1,8 +1,8 @@
 package com.wookidoki.profitlogic.controller;
 
 import com.wookidoki.profitlogic.common.ResponseData;
-import com.wookidoki.profitlogic.dto.ChatRequest;
-import com.wookidoki.profitlogic.dto.ChatResponse;
+import com.wookidoki.profitlogic.dto.chat.ChatRequest;
+import com.wookidoki.profitlogic.dto.chat.ChatResponse;
 import com.wookidoki.profitlogic.service.ChatService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

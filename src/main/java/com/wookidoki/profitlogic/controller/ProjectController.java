@@ -1,9 +1,9 @@
 package com.wookidoki.profitlogic.controller;
 
 import com.wookidoki.profitlogic.common.ResponseData;
-import com.wookidoki.profitlogic.dto.ProjectCreateRequest;
-import com.wookidoki.profitlogic.dto.ProjectResponse;
-import com.wookidoki.profitlogic.dto.ProjectUpdateRequest;
+import com.wookidoki.profitlogic.dto.project.ProjectCreateRequest;
+import com.wookidoki.profitlogic.dto.project.ProjectResponse;
+import com.wookidoki.profitlogic.dto.project.ProjectUpdateRequest;
 import com.wookidoki.profitlogic.service.ProjectService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
