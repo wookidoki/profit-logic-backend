@@ -201,13 +201,102 @@ public class ChatService {
                     project.getWorkHours() / 22.0);
         }
 
+        // 전략/방법/어떻게 관련
+        if (q.contains("전략") || q.contains("방법") || q.contains("어떻게") || q.contains("조언") || q.contains("추천")) {
+            java.math.BigDecimal cmRate = hasCm
+                    ? cm.multiply(java.math.BigDecimal.valueOf(100))
+                        .divide(project.getPrice(), 1, java.math.RoundingMode.HALF_UP)
+                    : java.math.BigDecimal.ZERO;
+            StringBuilder sb = new StringBuilder();
+            sb.append(String.format("프로젝트 '%s' 개선 전략을 제안해드립니다.\n\n", project.getTitle()));
+
+            if (!hasCm) {
+                sb.append("1. [긴급] 현재 판매가가 변동비보다 낮습니다. 가격 인상이 최우선입니다.\n");
+            } else if (cmRate.compareTo(java.math.BigDecimal.valueOf(30)) < 0) {
+                sb.append("1. 공헌이익률이 낮습니다. 변동비 절감 또는 가격 인상을 고려하세요.\n");
+            } else {
+                sb.append("1. 공헌이익률이 양호합니다. 판매량 확대에 집중하세요.\n");
+            }
+
+            if (project.getFixedCost().compareTo(java.math.BigDecimal.valueOf(500000)) > 0) {
+                sb.append("2. 고정비가 높은 편입니다. 불필요한 구독/렌탈 비용을 점검하세요.\n");
+            } else {
+                sb.append("2. 고정비는 적정 수준입니다.\n");
+            }
+
+            sb.append("3. 시나리오 시뮬레이션에서 가격/비용 변경 효과를 미리 확인해보세요.\n");
+            sb.append("4. 대시보드 트렌드 탭에서 월별 추이를 확인하세요.");
+            return sb.toString();
+        }
+
+        // 비교 관련
+        if (q.contains("비교") || q.contains("경쟁") || q.contains("시장") || q.contains("평균")) {
+            return String.format("프로젝트 '%s'의 현재 지표 요약입니다.\n\n" +
+                    "- 판매가: %s원\n" +
+                    "- 공헌이익: %s원\n" +
+                    "- 공헌이익률: %s%%\n\n" +
+                    "일반적으로 공헌이익률 30%% 이상이면 건전한 수익 구조입니다.\n" +
+                    "시나리오 시뮬레이션에서 경쟁사 가격 대비 분석을 해보세요.",
+                    project.getTitle(), project.getPrice(), cm,
+                    hasCm ? cm.multiply(java.math.BigDecimal.valueOf(100))
+                            .divide(project.getPrice(), 1, java.math.RoundingMode.HALF_UP) : "0");
+        }
+
+        // 목표/달성 관련
+        if (q.contains("목표") || q.contains("달성") || q.contains("얼마나") || q.contains("필요")) {
+            if (!hasCm) {
+                return "현재 공헌이익이 0 이하이므로 목표 달성이 불가능합니다. 가격 인상을 먼저 검토하세요.";
+            }
+            java.math.BigDecimal laborCost = project.getHourlyWage()
+                    .multiply(java.math.BigDecimal.valueOf(project.getWorkHours()));
+            java.math.BigDecimal totalNeeded = project.getFixedCost().add(laborCost);
+            java.math.BigDecimal neededQty = totalNeeded
+                    .divide(cm, 1, java.math.RoundingMode.HALF_UP);
+            return String.format("프로젝트 '%s'의 목표 분석입니다.\n\n" +
+                    "- 월 고정비: %s원\n" +
+                    "- 월 인건비(기회비용): %s원\n" +
+                    "- 합계 필요 금액: %s원\n" +
+                    "- 공헌이익: %s원/개\n\n" +
+                    "→ 인건비 포함 손익분기: 약 %s개/월\n" +
+                    "이 이상 판매해야 시급 %s원 이상의 실질 수익이 발생합니다.",
+                    project.getTitle(), project.getFixedCost(), laborCost,
+                    totalNeeded, cm, neededQty, project.getHourlyWage());
+        }
+
+        // 요약/종합
+        if (q.contains("요약") || q.contains("종합") || q.contains("전체") || q.contains("현황") || q.contains("상태")) {
+            java.math.BigDecimal bepVal = hasCm
+                    ? project.getFixedCost().divide(cm, 1, java.math.RoundingMode.HALF_UP)
+                    : java.math.BigDecimal.ZERO;
+            java.math.BigDecimal cmRate = hasCm
+                    ? cm.multiply(java.math.BigDecimal.valueOf(100))
+                        .divide(project.getPrice(), 1, java.math.RoundingMode.HALF_UP)
+                    : java.math.BigDecimal.ZERO;
+            return String.format("프로젝트 '%s' 종합 요약입니다.\n\n" +
+                    "📊 핵심 지표\n" +
+                    "- 판매가: %s원 | 변동비: %s원\n" +
+                    "- 공헌이익: %s원 (공헌이익률 %s%%)\n" +
+                    "- 고정비: %s원/월\n" +
+                    "- 손익분기점: %s개\n" +
+                    "- 시급: %s원 | 월 %d시간\n\n" +
+                    "%s",
+                    project.getTitle(),
+                    project.getPrice(), project.getVariableCost(),
+                    cm, cmRate, project.getFixedCost(), bepVal,
+                    project.getHourlyWage(), project.getWorkHours(),
+                    hasCm ? "더 자세한 분석은 대시보드에서 확인하세요." : "⚠️ 공헌이익이 0 이하입니다. 가격 조정이 필요합니다.");
+        }
+
         return String.format("'%s' 프로젝트에 대해 궁금하신 점이 있으시군요.\n\n" +
                 "이런 질문을 해보세요:\n" +
                 "- \"손익분기점이 몇 개야?\"\n" +
                 "- \"실질 시급은 얼마야?\"\n" +
                 "- \"비용을 줄일 방법이 있을까?\"\n" +
                 "- \"가격을 올려도 될까?\"\n" +
-                "- \"수익 구조는 어때?\"",
+                "- \"수익 구조는 어때?\"\n" +
+                "- \"전체 현황 요약해줘\"\n" +
+                "- \"목표 달성하려면 얼마나 팔아야 해?\"\n" +
+                "- \"개선 전략을 추천해줘\"",
                 project.getTitle());
     }
 }

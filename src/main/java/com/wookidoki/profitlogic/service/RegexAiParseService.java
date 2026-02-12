@@ -1,5 +1,6 @@
 package com.wookidoki.profitlogic.service;
 
+import com.wookidoki.profitlogic.domain.CreatorCategory;
 import com.wookidoki.profitlogic.dto.CalculateRequest;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +11,39 @@ import java.util.regex.Pattern;
 
 @Service
 public class RegexAiParseService implements AiParseService {
+
+    /**
+     * 자연어 텍스트에서 크리에이터 카테고리를 감지한다.
+     */
+    public CreatorCategory detectCategory(String text) {
+        if (text == null) return null;
+        String lower = text.toLowerCase();
+
+        if (lower.contains("웹소설") || lower.contains("소설") || lower.contains("연재")
+                || lower.contains("작가") || lower.contains("웹툰") || lower.contains("문피아")
+                || lower.contains("카카오페이지") || lower.contains("노벨피아")) {
+            return CreatorCategory.WEB_NOVEL;
+        }
+        if (lower.contains("숏폼") || lower.contains("유튜브") || lower.contains("영상")
+                || lower.contains("릴스") || lower.contains("틱톡") || lower.contains("쇼츠")
+                || lower.contains("크리에이터") || lower.contains("구독자")) {
+            return CreatorCategory.SHORT_FORM;
+        }
+        if (lower.contains("이모티콘") || lower.contains("스티커") || lower.contains("카카오")
+                || lower.contains("라인")) {
+            return CreatorCategory.EMOTICON;
+        }
+        if (lower.contains("블로그") || lower.contains("뉴스레터") || lower.contains("애드센스")
+                || lower.contains("티스토리") || lower.contains("네이버 블로그") || lower.contains("포스팅")) {
+            return CreatorCategory.BLOG;
+        }
+        if (lower.contains("앱") || lower.contains("saas") || lower.contains("개발")
+                || lower.contains("서비스") || lower.contains("플러그인") || lower.contains("템플릿")
+                || lower.contains("구독형")) {
+            return CreatorCategory.INDIE_DEV;
+        }
+        return null;
+    }
 
     @Override
     public CalculateRequest parse(String text) {
