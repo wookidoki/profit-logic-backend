@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +42,13 @@ public class AdminService {
 
     @Transactional(readOnly = true)
     public List<AdminUserResponse> getUsers() {
+        Map<Long, Long> projectCounts = projectRepository.countProjectsGroupByUserId()
+                .stream()
+                .collect(Collectors.toMap(
+                        row -> (Long) row[0],
+                        row -> (Long) row[1]
+                ));
+
         return userRepository.findAll().stream()
                 .map(user -> AdminUserResponse.builder()
                         .id(user.getId())
@@ -47,7 +56,7 @@ public class AdminService {
                         .nickname(user.getNickname())
                         .role(user.getRole().name())
                         .bizType(user.getBizType() != null ? user.getBizType().name() : null)
-                        .projectCount(projectRepository.findByUserId(user.getId()).size())
+                        .projectCount(projectCounts.getOrDefault(user.getId(), 0L).intValue())
                         .createdAt(user.getCreatedAt())
                         .build())
                 .toList();

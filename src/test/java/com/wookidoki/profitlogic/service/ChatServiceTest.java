@@ -5,6 +5,7 @@ import com.wookidoki.profitlogic.client.LlmResponse;
 import com.wookidoki.profitlogic.common.exception.ResourceNotFoundException;
 import com.wookidoki.profitlogic.common.exception.UnauthorizedAccessException;
 import com.wookidoki.profitlogic.domain.ChatLog;
+import com.wookidoki.profitlogic.domain.CreatorCategory;
 import com.wookidoki.profitlogic.domain.Project;
 import com.wookidoki.profitlogic.domain.User;
 import com.wookidoki.profitlogic.dto.chat.ChatRequest;
@@ -58,6 +59,7 @@ class ChatServiceTest {
                 .fixedCost(new BigDecimal("500000"))
                 .workHours(160)
                 .hourlyWage(new BigDecimal("9860"))
+                .creatorCategory(CreatorCategory.EMOTICON)
                 .build();
     }
 
@@ -71,14 +73,14 @@ class ChatServiceTest {
             User user = createUser(1L);
             Project project = createProject(10L, user);
             ChatRequest request = ChatRequest.builder()
-                    .projectId(10L).question("손익분기점이 뭔가요?").build();
+                    .projectId(10L).question("월 최소 몇 건을 해야 해?").build();
 
             given(userRepository.findById(1L)).willReturn(Optional.of(user));
             given(projectRepository.findById(10L)).willReturn(Optional.of(project));
             given(llmClient.isAvailable()).willReturn(true);
             given(llmClient.chatWithUsage(anyString(), anyString()))
                     .willReturn(LlmResponse.builder()
-                            .content("손익분기점은 63개입니다.")
+                            .content("월 최소 63건을 달성해야 합니다.")
                             .inputTokens(150).outputTokens(30).totalTokens(180).build());
             given(chatLogRepository.save(any(ChatLog.class)))
                     .willAnswer(invocation -> {
@@ -91,7 +93,7 @@ class ChatServiceTest {
 
             ChatResponse response = chatService.chat(1L, request);
 
-            assertThat(response.getAnswer()).isEqualTo("손익분기점은 63개입니다.");
+            assertThat(response.getAnswer()).isEqualTo("월 최소 63건을 달성해야 합니다.");
             assertThat(response.getTokensUsed()).isEqualTo(180);
 
             ArgumentCaptor<ChatLog> captor = ArgumentCaptor.forClass(ChatLog.class);
@@ -121,7 +123,7 @@ class ChatServiceTest {
 
             ChatResponse response = chatService.chat(1L, request);
 
-            assertThat(response.getAnswer()).contains("고정비");
+            assertThat(response.getAnswer()).contains("고정 지출");
             assertThat(response.getTokensUsed()).isZero();
             verify(llmClient, never()).chatWithUsage(anyString(), anyString());
         }
@@ -132,20 +134,44 @@ class ChatServiceTest {
     class SystemPrompt {
 
         @Test
-        @DisplayName("프로젝트 정보가 시스템 프롬프트에 포함됨")
-        void shouldContainProjectInfo() {
+        @DisplayName("프로젝트 정보가 크리에이터 용어로 시스템 프롬프트에 포함됨")
+        void shouldContainProjectInfoWithCreatorTerms() {
             User user = createUser(1L);
             Project project = createProject(10L, user);
 
             String prompt = chatService.buildSystemPrompt(project);
 
+            // Section headers
+            assertThat(prompt).contains("=== 현재 프로젝트 정보 ===");
+
+            // Creator terminology
+            assertThat(prompt).contains("건당 수익");
+            assertThat(prompt).contains("건당 비용");
+            assertThat(prompt).contains("건당 순수익");
+            assertThat(prompt).contains("월 고정 지출");
+            assertThat(prompt).contains("월 투입 시간");
+            assertThat(prompt).contains("본업 시급");
+
+            // Project data
             assertThat(prompt).contains("이모티콘 프로젝트");
-            assertThat(prompt).contains("10000");
-            assertThat(prompt).contains("2000");
-            assertThat(prompt).contains("500000");
-            assertThat(prompt).contains("8000");  // 공헌이익
+            assertThat(prompt).contains("10,000");
+            assertThat(prompt).contains("2,000");
+            assertThat(prompt).contains("500,000");
+            assertThat(prompt).contains("8,000");  // 건당 순수익
             assertThat(prompt).contains("160");
-            assertThat(prompt).contains("9860");
+            assertThat(prompt).contains("9,860");
+        }
+
+        @Test
+        @DisplayName("시스템 프롬프트에 FINANCIAL_ADVISOR 템플릿이 포함됨")
+        void shouldContainFinancialAdvisorTemplate() {
+            User user = createUser(1L);
+            Project project = createProject(10L, user);
+
+            String prompt = chatService.buildSystemPrompt(project);
+
+            assertThat(prompt).contains("Profit Logic");
+            assertThat(prompt).contains("사이드 프로젝트");
         }
     }
 
