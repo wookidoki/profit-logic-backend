@@ -9,6 +9,7 @@ import com.wookidoki.profitlogic.dto.ProjectResponse;
 import com.wookidoki.profitlogic.repository.ChatLogRepository;
 import com.wookidoki.profitlogic.repository.CostDetailRepository;
 import com.wookidoki.profitlogic.repository.ProjectRepository;
+import com.wookidoki.profitlogic.repository.ReportRepository;
 import com.wookidoki.profitlogic.repository.SimulationRepository;
 import com.wookidoki.profitlogic.repository.TimeLogRepository;
 import com.wookidoki.profitlogic.repository.UserRepository;
@@ -38,6 +39,7 @@ class ProjectServiceTest {
     @Mock private UserRepository userRepository;
     @Mock private SimulationRepository simulationRepository;
     @Mock private ChatLogRepository chatLogRepository;
+    @Mock private ReportRepository reportRepository;
     @Mock private CostDetailRepository costDetailRepository;
     @Mock private TimeLogRepository timeLogRepository;
 
@@ -163,6 +165,7 @@ class ProjectServiceTest {
             projectService.delete(10L, 1L);
 
             verify(chatLogRepository).deleteByProjectId(10L);
+            verify(reportRepository).deleteByProjectId(10L);
             verify(simulationRepository).deleteByProjectId(10L);
             verify(costDetailRepository).deleteByProjectId(10L);
             verify(timeLogRepository).deleteByProjectId(10L);
