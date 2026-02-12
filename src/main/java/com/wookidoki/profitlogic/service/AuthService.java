@@ -3,6 +3,7 @@ package com.wookidoki.profitlogic.service;
 import com.wookidoki.profitlogic.common.exception.DuplicateEmailException;
 import com.wookidoki.profitlogic.common.exception.InvalidCredentialsException;
 import com.wookidoki.profitlogic.config.jwt.JwtTokenProvider;
+import com.wookidoki.profitlogic.domain.Role;
 import com.wookidoki.profitlogic.domain.User;
 import com.wookidoki.profitlogic.dto.auth.LoginRequest;
 import com.wookidoki.profitlogic.dto.auth.LoginResponse;
@@ -45,13 +46,14 @@ public class AuthService {
             throw new InvalidCredentialsException();
         }
 
-        String token = jwtTokenProvider.createToken(user.getId(), user.getEmail(), user.getRole().name());
+        String roleStr = user.getRole() != null ? user.getRole().name() : Role.ROLE_USER.name();
+        String token = jwtTokenProvider.createToken(user.getId(), user.getEmail(), roleStr);
 
         return LoginResponse.builder()
                 .accessToken(token)
                 .email(user.getEmail())
                 .nickname(user.getNickname())
-                .role(user.getRole().name())
+                .role(roleStr)
                 .build();
     }
 }
