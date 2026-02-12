@@ -10,8 +10,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.EntityManager;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.YearMonth;
 
 @Slf4j
 @Component
@@ -28,6 +31,7 @@ public class DataInitializer implements CommandLineRunner {
     private final CommentRepository commentRepository;
     private final ChatLogRepository chatLogRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EntityManager entityManager;
 
     @Override
     @Transactional
@@ -365,6 +369,11 @@ public class DataInitializer implements CommandLineRunner {
                         + "판매가는 3000원, 변동비는 100원입니다. BEP ≈ 18회분입니다.")
                 .build());
 
+        // ── 트렌드 데모: 과거 6개월치 비용/시간 데이터 ──
+        seedTrendData(p1, u1);
+        seedTrendData(p11, u11);
+        seedTrendData(p21, u21);
+
         log.info("[DataInitializer] 시드 데이터 생성 완료!");
         log.info("  관리자: admin@profitlogic.com / Test1234!");
         log.info("  페르소나: creator01~10, seller01~10, dev01~10 @test.com / Test1234!");
@@ -421,5 +430,58 @@ public class DataInitializer implements CommandLineRunner {
                 .logDate(LocalDate.now().plusDays(daysAgo))
                 .memo(memo)
                 .build());
+    }
+
+    /**
+     * 트렌드 차트 데모를 위한 과거 6개월치 비용/시간 데이터 생성.
+     * 비용은 서서히 감소, 시간 효율은 개선되는 패턴.
+     */
+    private void seedTrendData(Project project, User user) {
+        YearMonth current = YearMonth.now();
+        // 고정비 변화 (서서히 감소): 1.3x → 1.2x → 1.1x → 1.05x → 1.0x → 0.95x
+        double[] fixedMultipliers = {1.30, 1.20, 1.10, 1.05, 1.00, 0.95};
+        // 시간 변화 (효율 개선): 1.4x → 1.3x → 1.2x → 1.1x → 1.05x → 1.0x
+        double[] hoursMultipliers = {1.40, 1.30, 1.20, 1.10, 1.05, 1.00};
+
+        BigDecimal baseFixed = project.getFixedCost();
+        int baseHours = project.getWorkHours();
+
+        for (int i = 5; i >= 0; i--) {
+            YearMonth ym = current.minusMonths(i);
+            LocalDate midMonth = ym.atDay(15);
+
+            // 과거 비용 데이터 (FIXED)
+            BigDecimal monthlyFixed = baseFixed.multiply(bd(String.valueOf(fixedMultipliers[5 - i])))
+                    .setScale(0, java.math.RoundingMode.HALF_UP);
+            CostDetail cost = costDetailRepository.save(CostDetail.builder()
+                    .project(project)
+                    .category(CostCategory.OTHER)
+                    .costName(ym.getMonthValue() + "월 운영비")
+                    .costType("FIXED")
+                    .amount(monthlyFixed)
+                    .memo("트렌드 데모 데이터")
+                    .build());
+
+            // created_at을 해당 월로 수정 (네이티브 쿼리)
+            entityManager.flush();
+            entityManager.createNativeQuery(
+                    "UPDATE cost_details SET created_at = :date WHERE cost_detail_id = :id")
+                    .setParameter("date", midMonth.atStartOfDay())
+                    .setParameter("id", cost.getId())
+                    .executeUpdate();
+
+            // 과거 시간 데이터
+            double monthlyHours = baseHours * hoursMultipliers[5 - i] / 4.0;
+            for (int week = 0; week < 4; week++) {
+                LocalDate logDate = ym.atDay(Math.min(1 + week * 7, ym.lengthOfMonth()));
+                timeLogRepository.save(TimeLog.builder()
+                        .project(project)
+                        .taskName(ym.getMonthValue() + "월 " + (week + 1) + "주차 작업")
+                        .hoursSpent(bd(String.format("%.1f", monthlyHours)))
+                        .logDate(logDate)
+                        .memo(null)
+                        .build());
+            }
+        }
     }
 }
