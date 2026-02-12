@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.EntityManager;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.YearMonth;
 
@@ -516,7 +517,7 @@ public class DataInitializer implements CommandLineRunner {
 
             // 과거 비용 데이터 (FIXED)
             BigDecimal monthlyFixed = baseFixed.multiply(bd(String.valueOf(fixedMultipliers[5 - i])))
-                    .setScale(0, java.math.RoundingMode.HALF_UP);
+                    .setScale(0, RoundingMode.HALF_UP);
             CostDetail cost = costDetailRepository.save(CostDetail.builder()
                     .project(project)
                     .category(CostCategory.OTHER)
