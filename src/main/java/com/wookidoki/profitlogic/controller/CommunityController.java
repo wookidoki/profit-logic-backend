@@ -1,7 +1,10 @@
 package com.wookidoki.profitlogic.controller;
 
 import com.wookidoki.profitlogic.common.ResponseData;
-import com.wookidoki.profitlogic.dto.*;
+import com.wookidoki.profitlogic.dto.community.BoardPostCreateRequest;
+import com.wookidoki.profitlogic.dto.community.BoardPostResponse;
+import com.wookidoki.profitlogic.dto.community.CommentCreateRequest;
+import com.wookidoki.profitlogic.dto.community.CommentResponse;
 import com.wookidoki.profitlogic.service.CommunityService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

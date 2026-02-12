@@ -1,8 +1,8 @@
 package com.wookidoki.profitlogic.service;
 
 import com.wookidoki.profitlogic.domain.logic.FinancialCalculator;
-import com.wookidoki.profitlogic.dto.CalculateRequest;
-import com.wookidoki.profitlogic.dto.CalculateResponse;
+import com.wookidoki.profitlogic.dto.finance.CalculateRequest;
+import com.wookidoki.profitlogic.dto.finance.CalculateResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

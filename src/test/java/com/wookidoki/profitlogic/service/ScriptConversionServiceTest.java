@@ -2,7 +2,7 @@ package com.wookidoki.profitlogic.service;
 
 import com.wookidoki.profitlogic.common.exception.BusinessLogicException;
 import com.wookidoki.profitlogic.domain.CreatorCategory;
-import com.wookidoki.profitlogic.dto.CalculateRequest;
+import com.wookidoki.profitlogic.dto.finance.CalculateRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

@@ -1,7 +1,7 @@
 package com.wookidoki.profitlogic.dto.script;
 
 import com.wookidoki.profitlogic.domain.CreatorCategory;
-import com.wookidoki.profitlogic.dto.CalculateResponse;
+import com.wookidoki.profitlogic.dto.finance.CalculateResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

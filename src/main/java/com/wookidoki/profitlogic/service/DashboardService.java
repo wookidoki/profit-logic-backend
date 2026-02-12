@@ -1,7 +1,10 @@
 package com.wookidoki.profitlogic.service;
 
 import com.wookidoki.profitlogic.domain.Project;
-import com.wookidoki.profitlogic.dto.*;
+import com.wookidoki.profitlogic.dto.dashboard.DashboardSummaryResponse;
+import com.wookidoki.profitlogic.dto.finance.ActionCardDto;
+import com.wookidoki.profitlogic.dto.project.ProjectAnalysisResponse;
+import com.wookidoki.profitlogic.dto.project.ProjectInsightDto;
 import com.wookidoki.profitlogic.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,6 +1,6 @@
 package com.wookidoki.profitlogic.service;
 
-import com.wookidoki.profitlogic.dto.CalculateRequest;
+import com.wookidoki.profitlogic.dto.finance.CalculateRequest;
 
 public interface AiParseService {
 

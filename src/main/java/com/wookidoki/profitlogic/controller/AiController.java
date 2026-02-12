@@ -2,9 +2,9 @@ package com.wookidoki.profitlogic.controller;
 
 import com.wookidoki.profitlogic.common.ResponseData;
 import com.wookidoki.profitlogic.domain.CreatorCategory;
-import com.wookidoki.profitlogic.dto.AiParseRequest;
-import com.wookidoki.profitlogic.dto.AiParseResponse;
-import com.wookidoki.profitlogic.dto.CalculateRequest;
+import com.wookidoki.profitlogic.dto.ai.AiParseRequest;
+import com.wookidoki.profitlogic.dto.ai.AiParseResponse;
+import com.wookidoki.profitlogic.dto.finance.CalculateRequest;
 import com.wookidoki.profitlogic.service.RegexAiParseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

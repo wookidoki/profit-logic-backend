@@ -1,9 +1,9 @@
 package com.wookidoki.profitlogic.controller;
 
 import com.wookidoki.profitlogic.common.ResponseData;
-import com.wookidoki.profitlogic.dto.LoginRequest;
-import com.wookidoki.profitlogic.dto.LoginResponse;
-import com.wookidoki.profitlogic.dto.SignupRequest;
+import com.wookidoki.profitlogic.dto.auth.LoginRequest;
+import com.wookidoki.profitlogic.dto.auth.LoginResponse;
+import com.wookidoki.profitlogic.dto.auth.SignupRequest;
 import com.wookidoki.profitlogic.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

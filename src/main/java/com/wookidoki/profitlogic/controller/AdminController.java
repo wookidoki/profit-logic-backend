@@ -1,8 +1,8 @@
 package com.wookidoki.profitlogic.controller;
 
 import com.wookidoki.profitlogic.common.ResponseData;
-import com.wookidoki.profitlogic.dto.AdminStatsResponse;
-import com.wookidoki.profitlogic.dto.AdminUserResponse;
+import com.wookidoki.profitlogic.dto.admin.AdminStatsResponse;
+import com.wookidoki.profitlogic.dto.admin.AdminUserResponse;
 import com.wookidoki.profitlogic.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
