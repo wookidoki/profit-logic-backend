@@ -10,6 +10,7 @@ import com.wookidoki.profitlogic.dto.ProjectUpdateRequest;
 import com.wookidoki.profitlogic.repository.ChatLogRepository;
 import com.wookidoki.profitlogic.repository.CostDetailRepository;
 import com.wookidoki.profitlogic.repository.ProjectRepository;
+import com.wookidoki.profitlogic.repository.ReportRepository;
 import com.wookidoki.profitlogic.repository.SimulationRepository;
 import com.wookidoki.profitlogic.repository.TimeLogRepository;
 import com.wookidoki.profitlogic.repository.UserRepository;
@@ -27,6 +28,7 @@ public class ProjectService {
     private final UserRepository userRepository;
     private final SimulationRepository simulationRepository;
     private final ChatLogRepository chatLogRepository;
+    private final ReportRepository reportRepository;
     private final CostDetailRepository costDetailRepository;
     private final TimeLogRepository timeLogRepository;
 
@@ -86,6 +88,7 @@ public class ProjectService {
         Project project = findProjectOrThrow(projectId);
         validateOwnership(project, userId);
         chatLogRepository.deleteByProjectId(projectId);
+        reportRepository.deleteByProjectId(projectId);
         simulationRepository.deleteByProjectId(projectId);
         costDetailRepository.deleteByProjectId(projectId);
         timeLogRepository.deleteByProjectId(projectId);
