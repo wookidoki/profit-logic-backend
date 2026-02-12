@@ -42,4 +42,9 @@ public class ProjectCreateRequest {
 
     @Builder.Default
     private Boolean isPublic = false;
+
+    @DecimalMin(value = "0", message = "목표 매출은 0 이상이어야 합니다.")
+    private BigDecimal targetRevenue;
+
+    private String targetMonth;
 }

@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface TimeLogRepository extends JpaRepository<TimeLog, Long> {
 
+    List<TimeLog> findByProjectId(Long projectId);
+
     List<TimeLog> findByProjectIdOrderByLogDateDesc(Long projectId);
 
     List<TimeLog> findByProjectIdAndLogDateBetween(Long projectId, LocalDate start, LocalDate end);

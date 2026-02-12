@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.util.Map;
 
 @Entity
 @Table(name = "projects")
@@ -52,6 +51,12 @@ public class Project extends BaseTimeEntity {
     @Column(name = "script_inputs", columnDefinition = "TEXT")
     private String scriptInputs;
 
+    @Column(name = "target_revenue", precision = 19, scale = 2)
+    private BigDecimal targetRevenue;
+
+    @Column(name = "target_month", length = 7)
+    private String targetMonth;
+
     public void update(String title, BigDecimal price, BigDecimal variableCost,
                        BigDecimal fixedCost, Integer workHours, BigDecimal hourlyWage,
                        Boolean isPublic) {
@@ -62,5 +67,10 @@ public class Project extends BaseTimeEntity {
         this.workHours = workHours;
         this.hourlyWage = hourlyWage;
         this.isPublic = isPublic;
+    }
+
+    public void updateGoal(BigDecimal targetRevenue, String targetMonth) {
+        this.targetRevenue = targetRevenue;
+        this.targetMonth = targetMonth;
     }
 }

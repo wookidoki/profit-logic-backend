@@ -46,6 +46,8 @@ public class ProjectService {
                 .workHours(request.getWorkHours())
                 .hourlyWage(request.getHourlyWage())
                 .isPublic(request.getIsPublic() != null ? request.getIsPublic() : false)
+                .targetRevenue(request.getTargetRevenue())
+                .targetMonth(request.getTargetMonth())
                 .build();
 
         return ProjectResponse.from(projectRepository.save(project));
@@ -79,6 +81,7 @@ public class ProjectService {
                 request.getHourlyWage(),
                 request.getIsPublic()
         );
+        project.updateGoal(request.getTargetRevenue(), request.getTargetMonth());
 
         return ProjectResponse.from(project);
     }
