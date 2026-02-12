@@ -74,7 +74,7 @@ MYSQL_ROOT_PASSWORD=ProfitLogic2026!Root
 MYSQL_USER=profituser
 MYSQL_PASSWORD=ProfitLogic2026!User
 JWT_SECRET=cHJvZC1zZWNyZXQta2V5LWZvci1wcm9maXQtbG9naWMtYXBwbGljYXRpb24tMjAyNi1wcm9kdWN0aW9u
-SERVER_IP=16.147.14.75
+SERVER_IP=35.89.105.181
 ENVEOF
     echo ".env file created."
 fi
@@ -84,8 +84,8 @@ docker compose -f docker-compose.prod.yml up -d --build
 
 echo ""
 echo "=== Deployment Complete ==="
-echo "Frontend: http://16.147.14.75"
-echo "Backend API: http://16.147.14.75/api/health"
+echo "Frontend: http://35.89.105.181"
+echo "Backend API: http://35.89.105.181/api/health"
 echo ""
 echo "Check status: docker compose -f docker-compose.prod.yml ps"
 echo "Check logs:   docker compose -f docker-compose.prod.yml logs -f app"
