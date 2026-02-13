@@ -67,22 +67,27 @@ cp -r dist $APP_DIR/profit-logic-backend/frontend-dist
 echo "[6/6] Starting Docker Compose..."
 cd $APP_DIR/profit-logic-backend
 
-# Create .env if not exists
+# .env 파일이 없으면 안내 메시지 출력
 if [ ! -f .env ]; then
-    cat > .env << 'ENVEOF'
-MYSQL_ROOT_PASSWORD=CHANGE_ME
-MYSQL_USER=CHANGE_ME
-MYSQL_PASSWORD=CHANGE_ME
-JWT_SECRET=CHANGE_ME
-SERVER_IP=CHANGE_ME
-GEMINI_API_KEY=CHANGE_ME
-ENVEOF
-    echo "================================================"
-    echo "  .env file created with placeholder values."
-    echo "  Please edit .env and fill in actual secrets"
-    echo "  before running this script again."
-    echo "================================================"
+    echo ""
+    echo "  .env 파일이 없습니다. 아래 형식으로 생성해주세요:"
+    echo ""
+    echo "  MYSQL_ROOT_PASSWORD=<your-root-password>"
+    echo "  MYSQL_USER=<your-db-user>"
+    echo "  MYSQL_PASSWORD=<your-db-password>"
+    echo "  JWT_SECRET=<your-jwt-secret>"
+    echo "  SERVER_IP=<your-server-ip>"
+    echo "  GEMINI_API_KEY=<your-gemini-api-key>"
+    echo ""
+    echo "생성 후 다시 실행해주세요."
     exit 1
+fi
+
+# Ensure GEMINI_API_KEY is in .env
+if ! grep -q "GEMINI_API_KEY" .env 2>/dev/null; then
+    echo ""
+    echo "  .env에 GEMINI_API_KEY가 없습니다. 추가해주세요."
+    echo "  (없으면 AI 챗봇이 규칙 기반으로만 동작합니다)"
 fi
 
 docker compose -f docker-compose.prod.yml down 2>/dev/null || true
@@ -90,8 +95,8 @@ docker compose -f docker-compose.prod.yml up -d --build
 
 echo ""
 echo "=== Deployment Complete ==="
-echo "Frontend: http://\$(grep SERVER_IP .env | cut -d= -f2)"
-echo "Backend API: http://\$(grep SERVER_IP .env | cut -d= -f2)/api/health"
+echo "Frontend: http://profitlogic.cloud"
+echo "Backend API: http://profitlogic.cloud/api/health"
 echo ""
 echo "Check status: docker compose -f docker-compose.prod.yml ps"
 echo "Check logs:   docker compose -f docker-compose.prod.yml logs -f app"
