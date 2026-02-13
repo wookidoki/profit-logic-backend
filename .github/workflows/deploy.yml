@@ -96,5 +96,18 @@ jobs:
             sleep 20
             echo "=== Health Check ==="
             curl -sf http://localhost/api/health && echo "" || echo "WARN: Health check failed"
+
+            # Diagnostic: test login + show app logs
+            echo "=== Login Test ==="
+            curl -s -X POST -H "Content-Type: application/json" \
+              -d '{"email":"admin@profitlogic.com","password":"Test1234!"}' \
+              http://localhost/api/v1/auth/login || echo "Login request failed"
+            echo ""
+
+            echo "=== App Logs (last 100 lines) ==="
+            docker compose -f docker-compose.prod.yml logs --tail=100 app 2>&1 || true
+
+            echo "=== MySQL Status ==="
+            docker exec profit-logic-mysql mysqladmin -uroot -p"$MYSQL_ROOT_PASSWORD" status 2>&1 || echo "MySQL status check failed"
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
