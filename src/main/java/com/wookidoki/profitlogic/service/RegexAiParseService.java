@@ -56,6 +56,10 @@ public class RegexAiParseService implements AiParseService {
         BigDecimal fixedCost = extract(text,
                 "고정비", "임대료", "월세", "고정", "렌트", "구독료비", "서버비",
                 "호스팅", "유지비", "월비용", "월 비용", "관리비");
+        // "월 X만원 쓰고있어" 등 지출 패턴 감지
+        if (fixedCost.compareTo(BigDecimal.ZERO) == 0) {
+            fixedCost = extractMonthlySpend(text);
+        }
         BigDecimal hourlyWage = extract(text,
                 "시급", "시간당", "최저시급", "목표시급", "기대시급", "희망시급");
 
@@ -93,9 +97,9 @@ public class RegexAiParseService implements AiParseService {
     }
 
     private Integer extractWorkHours(String text) {
-        // "하루 X시간" 패턴 → 월간으로 변환 (×22)
+        // "하루 X시간" / "하루에 X시간" 패턴 → 월간으로 변환 (×22)
         Pattern dailyPattern = Pattern.compile(
-                "하루\\s*(?:평균\\s*)?([0-9]+\\.?[0-9]*)\\s*시간",
+                "하루[에서]?\\s*(?:평균\\s*)?([0-9]+\\.?[0-9]*)\\s*시간",
                 Pattern.CASE_INSENSITIVE);
         Matcher dailyMatcher = dailyPattern.matcher(text);
         if (dailyMatcher.find()) {
@@ -106,7 +110,7 @@ public class RegexAiParseService implements AiParseService {
 
         // "월 XX시간" 패턴
         Pattern monthlyPattern = Pattern.compile(
-                "(?:월|한달)\\s*(?:평균\\s*)?([0-9]+\\.?[0-9]*)\\s*시간",
+                "(?:월|한달)[에서]?\\s*(?:평균\\s*)?([0-9]+\\.?[0-9]*)\\s*시간",
                 Pattern.CASE_INSENSITIVE);
         Matcher monthlyMatcher = monthlyPattern.matcher(text);
         if (monthlyMatcher.find()) {
@@ -117,6 +121,20 @@ public class RegexAiParseService implements AiParseService {
         // 일반 키워드 기반
         BigDecimal value = extract(text, "근무시간", "작업시간", "근무", "작업");
         return value.intValue();
+    }
+
+    /**
+     * "월 3만원씩 쓰고있어", "매달 5만원 지출" 등 월간 지출 패턴 감지
+     */
+    private BigDecimal extractMonthlySpend(String text) {
+        Pattern pattern = Pattern.compile(
+                "(?:월|매달|한달)[에서]?\\s*([0-9,]+\\.?[0-9]*)\\s*(만|천)?\\s*원?\\s*(?:씩|정도|쯤)?\\s*(?:쓰|지출|나가|내|들|비용)",
+                Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(text);
+        if (matcher.find()) {
+            return parseKoreanNumber(matcher.group(1), matcher.group(2));
+        }
+        return BigDecimal.ZERO;
     }
 
     private BigDecimal findNumberAfterKeyword(String text, String keyword) {
