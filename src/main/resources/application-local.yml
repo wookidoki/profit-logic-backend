@@ -20,6 +20,7 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
+        globally_quoted_identifiers: false
 
 logging:
   level:
