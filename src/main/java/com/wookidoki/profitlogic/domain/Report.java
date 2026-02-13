@@ -24,7 +24,6 @@ public class Report extends BaseTimeEntity {
     @Column(name = "year_month", nullable = false, length = 7)
     private String yearMonth;
 
-    @Lob
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 

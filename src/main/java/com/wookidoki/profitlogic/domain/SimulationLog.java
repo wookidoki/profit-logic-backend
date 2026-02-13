@@ -22,7 +22,6 @@ public class SimulationLog extends BaseTimeEntity {
     @Column(nullable = false, length = 200)
     private String description;
 
-    @Lob
     @Column(name = "result_json", nullable = false, columnDefinition = "TEXT")
     private String resultJson;
 }

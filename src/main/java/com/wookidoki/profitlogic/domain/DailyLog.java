@@ -26,27 +26,21 @@ public class DailyLog extends BaseTimeEntity {
     @Column(name = "log_date", nullable = false)
     private LocalDate logDate;
 
-    @Lob
     @Column(name = "project_summary", columnDefinition = "TEXT")
     private String projectSummary;
 
-    @Lob
     @Column(name = "cost_summary", columnDefinition = "TEXT")
     private String costSummary;
 
-    @Lob
     @Column(name = "time_log_summary", columnDefinition = "TEXT")
     private String timeLogSummary;
 
-    @Lob
     @Column(name = "chat_summary", columnDefinition = "TEXT")
     private String chatSummary;
 
-    @Lob
     @Column(name = "community_summary", columnDefinition = "TEXT")
     private String communitySummary;
 
-    @Lob
     @Column(name = "personal_memo", columnDefinition = "TEXT")
     private String personalMemo;
 

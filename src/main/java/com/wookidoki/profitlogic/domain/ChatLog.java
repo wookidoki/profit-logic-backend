@@ -23,11 +23,9 @@ public class ChatLog extends BaseTimeEntity {
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 
-    @Lob
     @Column(nullable = false, columnDefinition = "TEXT")
     private String question;
 
-    @Lob
     @Column(nullable = false, columnDefinition = "TEXT")
     private String answer;
 

@@ -47,7 +47,6 @@ public class Project extends BaseTimeEntity {
     @Column(name = "creator_category", length = 30)
     private CreatorCategory creatorCategory;
 
-    @Lob
     @Column(name = "script_inputs", columnDefinition = "TEXT")
     private String scriptInputs;
 
