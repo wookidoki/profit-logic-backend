@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface BoardPostRepository extends JpaRepository<BoardPost, Long> {
@@ -12,4 +13,6 @@ public interface BoardPostRepository extends JpaRepository<BoardPost, Long> {
     Page<BoardPost> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
     List<BoardPost> findByUserId(Long userId);
+
+    List<BoardPost> findByUserIdAndCreatedAtBetween(Long userId, LocalDateTime start, LocalDateTime end);
 }
