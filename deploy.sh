@@ -70,20 +70,19 @@ cd $APP_DIR/profit-logic-backend
 # Create .env if not exists
 if [ ! -f .env ]; then
     cat > .env << 'ENVEOF'
-MYSQL_ROOT_PASSWORD=ProfitLogic2026!Root
-MYSQL_USER=profituser
-MYSQL_PASSWORD=ProfitLogic2026!User
-JWT_SECRET=cHJvZC1zZWNyZXQta2V5LWZvci1wcm9maXQtbG9naWMtYXBwbGljYXRpb24tMjAyNi1wcm9kdWN0aW9u
-SERVER_IP=35.89.105.181
-GEMINI_API_KEY=AIzaSyCn5NwuJw4RKslTDwIIr7RP2YhMkeZA8Ck
+MYSQL_ROOT_PASSWORD=CHANGE_ME
+MYSQL_USER=CHANGE_ME
+MYSQL_PASSWORD=CHANGE_ME
+JWT_SECRET=CHANGE_ME
+SERVER_IP=CHANGE_ME
+GEMINI_API_KEY=CHANGE_ME
 ENVEOF
-    echo ".env file created."
-fi
-
-# Ensure GEMINI_API_KEY is in .env (even if .env already exists)
-if ! grep -q "GEMINI_API_KEY" .env 2>/dev/null; then
-    echo "GEMINI_API_KEY=AIzaSyCn5NwuJw4RKslTDwIIr7RP2YhMkeZA8Ck" >> .env
-    echo "GEMINI_API_KEY added to .env"
+    echo "================================================"
+    echo "  .env file created with placeholder values."
+    echo "  Please edit .env and fill in actual secrets"
+    echo "  before running this script again."
+    echo "================================================"
+    exit 1
 fi
 
 docker compose -f docker-compose.prod.yml down 2>/dev/null || true
@@ -91,8 +90,8 @@ docker compose -f docker-compose.prod.yml up -d --build
 
 echo ""
 echo "=== Deployment Complete ==="
-echo "Frontend: http://35.89.105.181"
-echo "Backend API: http://35.89.105.181/api/health"
+echo "Frontend: http://\$(grep SERVER_IP .env | cut -d= -f2)"
+echo "Backend API: http://\$(grep SERVER_IP .env | cut -d= -f2)/api/health"
 echo ""
 echo "Check status: docker compose -f docker-compose.prod.yml ps"
 echo "Check logs:   docker compose -f docker-compose.prod.yml logs -f app"
