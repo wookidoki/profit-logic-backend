@@ -43,4 +43,13 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          script: /home/ubuntu/scripts/deploy-backend.sh
+          envs: GEMINI_API_KEY
+          script: |
+            ENV_FILE=/home/ubuntu/profit-logic/profit-logic-backend/.env
+            if [ -f "$ENV_FILE" ]; then
+              sed -i '/^GEMINI_API_KEY=/d' "$ENV_FILE"
+            fi
+            echo "GEMINI_API_KEY=${GEMINI_API_KEY}" >> "$ENV_FILE"
+            /home/ubuntu/scripts/deploy-backend.sh
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
