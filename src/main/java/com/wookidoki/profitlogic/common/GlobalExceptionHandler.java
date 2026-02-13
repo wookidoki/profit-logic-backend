@@ -5,6 +5,7 @@ import com.wookidoki.profitlogic.common.exception.DuplicateEmailException;
 import com.wookidoki.profitlogic.common.exception.InvalidCredentialsException;
 import com.wookidoki.profitlogic.common.exception.ResourceNotFoundException;
 import com.wookidoki.profitlogic.common.exception.UnauthorizedAccessException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -70,6 +72,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ResponseData<Void>> handleGeneral(Exception ex) {
+        log.error("Unhandled exception: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ResponseData.fail("서버 내부 오류가 발생했습니다."));
     }
