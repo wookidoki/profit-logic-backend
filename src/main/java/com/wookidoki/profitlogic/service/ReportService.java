@@ -96,18 +96,39 @@ public class ReportService {
 
         String userPrompt = buildUserPrompt(project, yearMonth, analysis);
 
-        LlmResponse llmResponse = llmClient.chatWithUsage(SYSTEM_PROMPT, userPrompt);
+        LlmResponse llmResponse;
+        try {
+            llmResponse = llmClient.chatWithUsage(SYSTEM_PROMPT, userPrompt);
+        } catch (BusinessLogicException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("리포트 AI 생성 실패 - 프로젝트: {}, 월: {}, 오류: {}",
+                    project.getTitle(), yearMonth, e.getMessage(), e);
+            throw new BusinessLogicException("AI 리포트 생성 중 오류가 발생했습니다: " + e.getMessage());
+        }
+
+        String content = llmResponse.getContent();
+        if (content == null || content.isBlank()) {
+            throw new BusinessLogicException("AI가 빈 리포트를 생성했습니다. 잠시 후 다시 시도해주세요.");
+        }
+
         log.info("리포트 생성 완료 - 프로젝트: {}, 월: {}, 토큰: {}",
                 project.getTitle(), yearMonth, llmResponse.getTotalTokens());
 
         Report report = Report.builder()
                 .project(project)
                 .yearMonth(yearMonth)
-                .content(llmResponse.getContent())
+                .content(content)
                 .tokensUsed(llmResponse.getTotalTokens())
                 .build();
 
-        return ReportResponse.from(reportRepository.save(report));
+        try {
+            return ReportResponse.from(reportRepository.save(report));
+        } catch (Exception e) {
+            log.error("리포트 DB 저장 실패 - 프로젝트: {}, 월: {}, 오류: {}",
+                    project.getTitle(), yearMonth, e.getMessage(), e);
+            throw new BusinessLogicException("리포트 저장 중 오류가 발생했습니다: " + e.getMessage());
+        }
     }
 
     private String buildUserPrompt(Project project, String yearMonth,

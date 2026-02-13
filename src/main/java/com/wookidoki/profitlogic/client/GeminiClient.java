@@ -85,6 +85,9 @@ public class GeminiClient implements LlmClient {
         } catch (WebClientRequestException e) {
             log.error("Gemini API 연결 실패: {}", e.getMessage());
             throw new BusinessLogicException("AI 응답 시간이 초과되었습니다.");
+        } catch (Exception e) {
+            log.error("Gemini API 예상치 못한 오류 - {}: {}", e.getClass().getSimpleName(), e.getMessage(), e);
+            throw new BusinessLogicException("AI 서비스 처리 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
 

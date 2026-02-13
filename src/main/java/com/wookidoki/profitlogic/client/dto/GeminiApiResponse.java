@@ -26,7 +26,8 @@ public class GeminiApiResponse {
                 || first.getContent().getParts().isEmpty()) {
             return "";
         }
-        return first.getContent().getParts().get(0).getText();
+        String text = first.getContent().getParts().get(0).getText();
+        return text != null ? text : "";
     }
 
     public int getPromptTokenCount() {
